@@ -116,18 +116,6 @@ model Monitor {
 
 // ACADEMIC
 
-model Sede {
-  id          Int     @id @default(autoincrement()) @db.SmallInt
-  name        String  @db.VarChar(48)
-  description String? @db.VarChar(255)
-  phone       String  @db.VarChar(20)
-
-  Shifts Shift[] // Relación uno a muchos con Shift
-
-  @@unique([name])
-  @@map("sedes")
-}
-
 model Area {
   id          Int     @id @default(autoincrement()) @db.SmallInt
   name        String  @db.VarChar(48)
@@ -165,6 +153,19 @@ model Course {
 
   @@map("courses")
 }
+
+model Sede {
+  id          Int     @id @default(autoincrement()) @db.SmallInt
+  name        String  @db.VarChar(48)
+  description String? @db.VarChar(255)
+  phone       String?  @db.VarChar(20)
+
+  Shifts Shift[] // Relación uno a muchos con Shift
+
+  @@unique([name])
+  @@map("sedes")
+}
+
 
 model Shift {
   id        Int       @id @default(autoincrement()) @db.SmallInt
