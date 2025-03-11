@@ -13,9 +13,6 @@ import { REQUEST_SCHEMA_KEY } from './prisma.constants';
 import { performance } from 'perf_hooks';
 import NodeCache from 'node-cache';
 
-import * as dotenv from 'dotenv';
-dotenv.config();
-
 @Injectable({ scope: Scope.REQUEST })
 export class PrismaService
   extends PrismaClient
@@ -141,7 +138,7 @@ export class PrismaService
       client = new PrismaClient({
         datasources: {
           db: {
-            url: `${process.env.DATABASE_URL}?schema=${this.schema}`,
+            url: `${process.env.DATABASE_URL}&schema=${this.schema}`, // tener en cuenta "&" y "?" de la URL
           },
         },
         log: [
