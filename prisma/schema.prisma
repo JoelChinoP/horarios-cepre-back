@@ -12,3 +12,232 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// USERS
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique @db.VarChar(48)
+  password  String    @db.VarChar(128)
+  isActive  Boolean   @default(true) @map("is_active")
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(3)
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp(3)
+  lastLogin DateTime? @map("last_login")
+
+  // Relación muchos a uno con Role
+  //roleId    Int       @map("role_id") @db.SmallInt
+  role String @db.VarChar(48)
+  //role   Role @relation(fields: [roleId], references: [id], onDelete: Restrict)
+
+  // Relaciones uno a uno
+  userProfile UserProfile?
+  teacher     Teacher?
+  supervisor  Supervisor?
+  monitor     Monitor?
+
+  //@@index([roleId]) // Índice para optimizar consultas por rol
+  @@index([role]) // Índice para optimizar consultas por rol
+  @@map("users")
+}
+
+model UserProfile {
+  id               Int      @id @default(autoincrement())
+  userId           Int      @unique @map("user_id") // Relación uno a uno con User
+  dni              String   @unique @db.VarChar(10)
+  firstName        String   @map("first_name") @db.VarChar(128)
+  lastName         String   @map("last_name") @db.VarChar(128)
+  phone            String?  @db.VarChar(15)
+  phonesAdditional String[] @map("phones_additional") @db.VarChar(15)
+  address          String?  @db.VarChar(255)
+  personalEmail    String?  @unique @map("personal_email") @db.VarChar(48)
+  isActive         Boolean  @default(true) @map("is_active")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamp(3)
+  updatedAt        DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(3)
+
+  // Relación uno a uno con User
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+model Teacher {
+  id             Int          @id @default(autoincrement())
+  userId         Int          @unique @map("user_id") // Relación uno a uno con User
+  courseId       Int          @map("course_id") @db.SmallInt // Relación muchos a uno con Course
+  maxHours       Int?         @map("max_hours") @db.SmallInt
+  scheduledHours Int?         @map("scheduled_hours") @db.SmallInt
+  createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamp(3)
+  updatedAt      DateTime     @default(now()) @updatedAt @map("updated_at") @db.Timestamp(3)
+  isActive       Boolean      @default(true) @map("is_active")
+  jobShiftType   JobShiftType @map("job_shift_type")
+
+  // Relaciones
+  courses   Course     @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Restrict)
+  schedules Schedule[]
+
+  @@map("teachers")
+}
+
+enum JobShiftType {
+  FullTime @map("FULL_TIME")
+  PartTime @map("PART_TIME")
+
+  @@map("job_shift_types")
+}
+
+model Supervisor {
+  id        Int      @id @default(autoincrement()) @db.SmallInt
+  userId    Int      @unique @map("user_id") // Relación uno a uno con User
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(3)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(3)
+
+  // Relaciones
+  users    User      @relation(fields: [userId], references: [id], onDelete: Restrict)
+  monitors Monitor[]
+
+  @@map("supervisors")
+}
+
+model Monitor {
+  id           Int      @id @default(autoincrement()) @db.SmallInt
+  userId       Int      @unique @map("user_id") // Relación uno a uno con User
+  supervisorId Int?     @map("supervisor_id") @db.SmallInt // Relación muchos a uno con Supervisor
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamp(3)
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(3)
+
+  // Relaciones
+  supervisors Supervisor? @relation(fields: [supervisorId], references: [id], onDelete: Restrict)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Restrict)
+  classes     Class[]
+
+  @@map("monitors")
+}
+
+// ACADEMIC
+
+model Sede {
+  id          Int     @id @default(autoincrement()) @db.SmallInt
+  name        String  @db.VarChar(48)
+  description String? @db.VarChar(255)
+  phone       String  @db.VarChar(20)
+
+  Shifts Shift[] // Relación uno a muchos con Shift
+
+  @@unique([name])
+  @@map("sedes")
+}
+
+model Area {
+  id          Int     @id @default(autoincrement()) @db.SmallInt
+  name        String  @db.VarChar(48)
+  description String? @db.VarChar(255)
+
+  areaCourseHours AreaCourseHour[] // Relación uno a muchos con AreaCourseHour
+  classes         Class[] // Relación uno a muchos con Class
+
+  @@unique([name])
+  @@map("areas")
+}
+
+model AreaCourseHour {
+  id         Int @id @default(autoincrement())
+  areaId     Int @map("area_id") @db.SmallInt
+  courseId   Int @map("course_id") @db.SmallInt
+  totalHours Int @map("total_hours") @db.SmallInt
+
+  // Relaciones
+  area   Area   @relation(fields: [areaId], references: [id], onDelete: Restrict)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Restrict)
+
+  @@unique([areaId, courseId]) // Índice único compuesto
+  @@map("area_course_hours")
+}
+
+model Course {
+  id          Int     @id @default(autoincrement()) @db.SmallInt
+  name        String  @db.VarChar(48)
+  color       String? @db.VarChar(7) //hexadecimal
+  description String? @db.VarChar(255)
+
+  areaCourseHours AreaCourseHour[] // Relación uno a muchos con AreaCourseHour
+  teachers        Teacher[] // Relación uno a muchos con Teacher
+
+  @@map("courses")
+}
+
+model Shift {
+  id        Int       @id @default(autoincrement()) @db.SmallInt
+  name      String    @db.VarChar(48)
+  startTime DateTime? @map("start_time") @db.Time
+  endTime   DateTime? @map("end_time") @db.Time
+
+  // Relación muchos a uno con Sede
+  idSede Int  @map("id_sede") @db.SmallInt
+  sede   Sede @relation(fields: [idSede], references: [id], onDelete: Restrict)
+
+  hourSessions HourSession[] // Relación uno a muchos con HourSession
+  classes      Class[] // Relación uno a muchos con Class
+
+  @@index([idSede]) // Índice para optimizar consultas por sede
+  @@map("shifts")
+}
+
+// SCHEDULES
+
+model Class {
+  id        Int    @id @default(autoincrement()) @db.SmallInt
+  name      String @db.VarChar(48)
+  areaId    Int    @map("area_id") @db.SmallInt
+  shiftId   Int    @map("shift_id") @db.SmallInt
+  monitorId Int?   @map("monitor_id") @db.SmallInt
+  capacity  Int    @default(100) @db.SmallInt
+
+  // Relaciones
+  schedules Schedule[]
+  area      Area       @relation(fields: [areaId], references: [id], onDelete: Restrict)
+  shift     Shift      @relation(fields: [shiftId], references: [id], onDelete: Restrict)
+  monitor   Monitor?   @relation(fields: [monitorId], references: [id], onDelete: SetNull)
+
+  @@map("classes")
+}
+
+model HourSession {
+  id              Int      @id @default(autoincrement()) @db.SmallInt
+  shiftId         Int      @map("shift_id") @db.SmallInt
+  period          Int      @db.SmallInt
+  startTime       DateTime @map("start_time") @db.Time
+  endTime         DateTime @map("end_time") @db.Time
+  durationMinutes Int      @default(40) @map("duration_minutes") @db.SmallInt
+
+  // Relaciones
+  schedules Schedule[]
+  shift     Shift      @relation(fields: [shiftId], references: [id], onDelete: Restrict)
+
+  @@map("hour_sessions")
+}
+
+model Schedule {
+  id            Int     @id @default(autoincrement())
+  classId       Int     @map("class_id") @db.SmallInt
+  hourSessionId Int     @map("hour_session_id") @db.SmallInt
+  teacherId     Int?    @map("teacher_id")
+  weekday       Weekday
+
+  // Relaciones
+  salon       Class       @relation(fields: [classId], references: [id], onDelete: Restrict)
+  hourSession HourSession @relation(fields: [hourSessionId], references: [id], onDelete: Restrict)
+  teacher     Teacher?    @relation(fields: [teacherId], references: [id], onDelete: SetNull)
+
+  @@map("schedules")
+}
+
+enum Weekday {
+  Monday    @map("MONDAY")
+  Tuesday   @map("TUESDAY")
+  Wednesday @map("WEDNESDAY")
+  Thursday  @map("THURSDAY")
+  Friday    @map("FRIDAY")
+  Saturday  @map("SATURDAY")
+  Sunday    @map("SUNDAY")
+}
