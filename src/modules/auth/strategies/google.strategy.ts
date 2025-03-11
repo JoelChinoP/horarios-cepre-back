@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '@modules/db/prisma/prisma.service';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
@@ -16,13 +16,13 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   }
 
   async validate(
-    request: any,
-    accessToken: string,
-    refreshToken: string,
+    _request: any,
+    _accessToken: string,
+    _refreshToken: string,
     profile: any,
     done: VerifyCallback,
   ): Promise<any> {
-    const { id, emails, displayName } = profile;
+    const { id, emails } = profile; //const { id, emails, displayName } = profile;
     
     const email = emails[0].value;
     
@@ -63,7 +63,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     // Actualizar el último login
     await this.prisma.user.update({
       where: { id: user.id },
-      data: { lastLogin: new Date() }
+      data: { lastLogin: new Date() },
     });
     
     done(null, user);
