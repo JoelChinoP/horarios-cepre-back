@@ -23,10 +23,11 @@ model User {
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(3)
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp(3)
   lastLogin DateTime? @map("last_login")
-  roleId    Int       @map("role_id") @db.SmallInt
 
   // Relación muchos a uno con Role
-  role   Role @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  //roleId    Int       @map("role_id") @db.SmallInt
+  role String @db.VarChar(48)
+  //role   Role @relation(fields: [roleId], references: [id], onDelete: Restrict)
 
   // Relaciones uno a uno
   userProfile UserProfile?
@@ -35,7 +36,7 @@ model User {
   monitor     Monitor?
 
   //@@index([roleId]) // Índice para optimizar consultas por rol
-  @@index([roleId]) // Índice para optimizar consultas por rol
+  @@index([role]) // Índice para optimizar consultas por rol
   @@map("users")
 }
 
@@ -239,43 +240,4 @@ enum Weekday {
   Friday    @map("FRIDAY")
   Saturday  @map("SATURDAY")
   Sunday    @map("SUNDAY")
-}
-
-
-//Roles
-model Role {
-  id          Int            @id @default(autoincrement())
-  name        String         @db.VarChar(48)
-  description String?        @db.VarChar(255)
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(3)
-
-  users User[] // Relación uno a muchos con User
-  rolesPermissions RolePermission[] // Relación uno a muchos con RolePermission
-
-  @@unique([name])
-  @@map("roles")
-}
-
-model Permission {
-  id          Int            @id @default(autoincrement())
-  name        String         @db.VarChar(48)
-  description String?        @db.VarChar(255)
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(3)
-
-  rolesPermissions RolePermission[] // Relación uno a muchos con RolePermission
-  
-  @@unique([name])
-  @@map("permissions")
-}
-
-model RolePermission {
-  roleId       Int @map("role_id") @db.SmallInt
-  permissionId Int @map("permission_id") @db.SmallInt
-
-  //relaciones
-  role          Role       @relation(fields: [roleId], references: [id], onDelete: Restrict)
-  permission    Permission @relation(fields: [permissionId], references: [id], onDelete: Restrict)
-
-  @@unique([roleId, permissionId])// Índice único compuesto
-  @@map("roles_permissions")
 }

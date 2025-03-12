@@ -16,6 +16,10 @@ import { SchemaMiddleware } from '@modules/db/prisma/prisma.middleware';
 // Users
 import { UsersModule } from '@modules/users/users.module';
 
+// Roles and Permissions
+import { RolesModule } from '@modules/roles/roles.module';
+import { PermissionsModule } from '@modules/permissions/permissions.module';
+
 @Module({
   imports: [
     PrismaModule.forRoot({
@@ -23,6 +27,8 @@ import { UsersModule } from '@modules/users/users.module';
     }),
     DrizzleModule,
     UsersModule,
+    RolesModule, // Agregar RolesModule
+    PermissionsModule, // Agregar PermissionsModule
   ],
   controllers: [AppController],
   providers: [AppService],
