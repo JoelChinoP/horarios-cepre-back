@@ -15,6 +15,7 @@ import { SchemaMiddleware } from '@modules/db/prisma/prisma.middleware';
 
 // Users
 import { UsersModule } from '@modules/users/users.module';
+import { AuthModule } from '@modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -23,8 +24,9 @@ import { UsersModule } from '@modules/users/users.module';
     }),
     DrizzleModule,
     UsersModule,
+    AuthModule
   ],
-  controllers: [AppController],
+  controllers: [AppController,],
   providers: [AppService],
 })
 export class AppModule implements NestModule {

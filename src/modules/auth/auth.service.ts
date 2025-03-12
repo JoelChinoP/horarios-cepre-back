@@ -1,18 +1,29 @@
 import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { User } from '@prisma/client';
+import { PrismaService } from 'prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService) {}
+  constructor(private prisma: PrismaService) {}
 
-  async generateJwtToken(user: User): Promise<string> {
-    const payload = {
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-    };
-    
-    return this.jwtService.sign(payload);
+  async validateGoogleUser(profile: any) {
+    const { id, emails } = profile;
+
+    const email = emails?.[0]?.value;
+
+    let user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      user = await this.prisma.user.create({
+        data: {
+          email,
+          googleId: id,
+          role: 'user', // Puedes asignar un rol por defecto
+        },
+      });
+    }
+
+    return user;
   }
 }
