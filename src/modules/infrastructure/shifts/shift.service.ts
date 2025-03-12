@@ -1,56 +1,55 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../db/prisma/prisma.service';
-import { CreateHourSessionDto } from './dto/create-hour-session.dto';
-import { UpdateHourSessionDto } from './dto/update-hour-session.dto';
+import { PrismaService } from '../../db/prisma/prisma.service';
+import { CreateShiftDto } from './dto/create-shift.dto';
+import { UpdateShiftDto } from './dto/update-shift.dto';
 
 @Injectable()
-export class HourSessionService {
+export class ShiftService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(data: CreateHourSessionDto) {
+  async create(data: CreateShiftDto) {
+    // Format the time strings as a complete ISO datetime
     const today = new Date().toISOString().split('T')[0];
 
-    return this.prisma.hourSession.create({
+    return this.prisma.shift.create({
       data: {
-        shiftId: data.shiftId,
-        period: data.period,
+        name: data.name,
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         startTime: `${today}T${data.startTime}.000Z`,
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         endTime: `${today}T${data.endTime}.000Z`,
-        durationMinutes: data.durationMinutes,
+        idSede: data.idSede,
       },
     });
   }
 
   async findAll() {
-    return this.prisma.hourSession.findMany({ include: { shift: true } });
+    return this.prisma.shift.findMany({ include: { sede: true } });
   }
 
   async findOne(id: number) {
-    return this.prisma.hourSession.findUnique({
+    return this.prisma.shift.findUnique({
       where: { id },
-      include: { shift: true },
+      include: { sede: true },
     });
   }
 
-  async update(id: number, data: UpdateHourSessionDto) {
+  async update(id: number, data: UpdateShiftDto) {
     const today = new Date().toISOString().split('T')[0];
-    return this.prisma.hourSession.update({
+    return this.prisma.shift.update({
       where: { id },
       data: {
-        shiftId: data.shiftId,
-        period: data.period,
+        name: data.name,
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         startTime: `${today}T${data.startTime}.000Z`,
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         endTime: `${today}T${data.endTime}.000Z`,
-        durationMinutes: data.durationMinutes,
+        idSede: data.idSede,
       },
     });
   }
 
   async remove(id: number) {
-    return this.prisma.hourSession.delete({ where: { id } });
+    return this.prisma.shift.delete({ where: { id } });
   }
 }
