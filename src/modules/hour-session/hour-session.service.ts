@@ -8,7 +8,19 @@ export class HourSessionService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: CreateHourSessionDto) {
-    return this.prisma.hourSession.create({ data });
+    const today = new Date().toISOString().split('T')[0];
+
+    return this.prisma.hourSession.create({
+      data: {
+        shiftId: data.shiftId,
+        period: data.period,
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        startTime: `${today}T${data.startTime}.000Z`,
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        endTime: `${today}T${data.endTime}.000Z`,
+        durationMinutes: data.durationMinutes,
+      },
+    });
   }
 
   async findAll() {
@@ -23,7 +35,19 @@ export class HourSessionService {
   }
 
   async update(id: number, data: UpdateHourSessionDto) {
-    return this.prisma.hourSession.update({ where: { id }, data });
+    const today = new Date().toISOString().split('T')[0];
+    return this.prisma.hourSession.update({
+      where: { id },
+      data: {
+        shiftId: data.shiftId,
+        period: data.period,
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        startTime: `${today}T${data.startTime}.000Z`,
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        endTime: `${today}T${data.endTime}.000Z`,
+        durationMinutes: data.durationMinutes,
+      },
+    });
   }
 
   async remove(id: number) {

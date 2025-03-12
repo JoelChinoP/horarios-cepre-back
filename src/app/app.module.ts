@@ -18,6 +18,7 @@ import { UsersModule } from '@modules/users/users.module';
 import { SedeModule } from '@modules/sedes/sede.module';
 import { ShiftModule } from '@modules/shifts/shift.module';
 import { HourSessionModule } from '@modules/hour-session/hour-session.module';
+import { CourseModule } from '@modules/courses/course.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { HourSessionModule } from '@modules/hour-session/hour-session.module';
     SedeModule,
     ShiftModule,
     HourSessionModule,
+    CourseModule,
   ],
   controllers: [AppController],
   providers: [AppService],
