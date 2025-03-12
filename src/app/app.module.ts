@@ -17,11 +17,11 @@ import { SchemaMiddleware } from '@modules/db/prisma/prisma.middleware';
 import { ModulesModule } from '@modules/modules.module';
 
 import { UsersModule } from '@modules/users/users.module';
+import { AuthModule } from '@modules/auth/auth.module';
 import { SedeModule } from '@modules/infrastructure/sedes/sede.module';
 import { ShiftModule } from '@modules/infrastructure/shifts/shift.module';
 import { HourSessionModule } from '@modules/schedules/hour-session/hour-session.module';
 import { CourseModule } from '@modules/academic/courses/course.module';
-
 
 @Module({
   imports: [
@@ -31,12 +31,13 @@ import { CourseModule } from '@modules/academic/courses/course.module';
     DrizzleModule,
     ModulesModule,
     UsersModule,
+    AuthModule
     SedeModule,
     ShiftModule,
     HourSessionModule,
     CourseModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController,],
   providers: [AppService],
 })
 export class AppModule implements NestModule {
