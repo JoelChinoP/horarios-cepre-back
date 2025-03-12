@@ -16,6 +16,13 @@ import { SchemaMiddleware } from '@modules/db/prisma/prisma.middleware';
 // Modules
 import { ModulesModule } from '@modules/modules.module';
 
+import { UsersModule } from '@modules/users/users.module';
+import { SedeModule } from '@modules/infrastructure/sedes/sede.module';
+import { ShiftModule } from '@modules/infrastructure/shifts/shift.module';
+import { HourSessionModule } from '@modules/schedules/hour-session/hour-session.module';
+import { CourseModule } from '@modules/academic/courses/course.module';
+
+
 @Module({
   imports: [
     PrismaModule.forRoot({
@@ -23,6 +30,11 @@ import { ModulesModule } from '@modules/modules.module';
     }),
     DrizzleModule,
     ModulesModule,
+    UsersModule,
+    SedeModule,
+    ShiftModule,
+    HourSessionModule,
+    CourseModule,
   ],
   controllers: [AppController],
   providers: [AppService],
@@ -36,6 +48,6 @@ export class AppModule implements NestModule {
         { path: 'roles', method: RequestMethod.ALL }, // ejemplo 2
         { path: 'permissions', method: RequestMethod.ALL }, // ejemplo 3
       )
-      .forRoutes('*');
+      .forRoutes('*path');
   }
 }
