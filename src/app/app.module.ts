@@ -15,6 +15,10 @@ import { SchemaMiddleware } from '@modules/db/prisma/prisma.middleware';
 
 // Users
 import { UsersModule } from '@modules/users/users.module';
+import { SedeModule } from '@modules/infrastructure/sedes/sede.module';
+import { ShiftModule } from '@modules/infrastructure/shifts/shift.module';
+import { HourSessionModule } from '@modules/schedules/hour-session/hour-session.module';
+import { CourseModule } from '@modules/academic/courses/course.module';
 
 @Module({
   imports: [
@@ -23,6 +27,10 @@ import { UsersModule } from '@modules/users/users.module';
     }),
     DrizzleModule,
     UsersModule,
+    SedeModule,
+    ShiftModule,
+    HourSessionModule,
+    CourseModule,
   ],
   controllers: [AppController],
   providers: [AppService],
