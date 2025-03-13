@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import { permissions } from 'drizzle/schema';
+import { eq } from 'drizzle-orm';
 
 @Injectable()
 export class PermissionsService {
@@ -22,5 +23,17 @@ export class PermissionsService {
   // Obtener todos los permisos
   async getAllPermissions() {
     return this.db.select().from(permissions);
+  }
+
+  async updatePermission(id: number, name: string, description?: string) {
+    return this.db
+      .update(permissions)
+      .set({ name, description })
+      .where(eq(permissions.id, id))
+      .returning();
+  }
+
+  async deletePermission(id: number) {
+    return this.db.delete(permissions).where(eq(permissions.id, id)).returning();
   }
 }

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Put, Delete } from '@nestjs/common';
 import { RolesService } from './roles.service';
 
 @Controller('roles')
@@ -26,5 +26,27 @@ export class RolesController {
   @Get()
   getAllRoles() {
     return this.rolesService.getAllRoles();
+  }
+
+  @Put(':id')
+  updateRole(
+  @Param('id') id: number,
+    @Body('name') name: string,
+    @Body('description') description?: string,
+  ) {
+    return this.rolesService.updateRole(id, name, description);
+  }
+
+  @Delete(':id')
+  deleteRole(@Param('id') id: number) {
+    return this.rolesService.deleteRole(id);
+  }
+
+  @Delete(':roleId/remove-permission/:permissionId')
+  removePermissionFromRole(
+    @Param('roleId') roleId: number,
+    @Param('permissionId') permissionId: number,
+  ) {
+    return this.rolesService.removePermissionFromRole(roleId, permissionId);
   }
 }
