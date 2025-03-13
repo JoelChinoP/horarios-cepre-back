@@ -14,7 +14,9 @@ export default defineConfig({
     user: process.env.DB_USER as string,
     password: process.env.DB_PASSWORD as string,
     database: process.env.DB_DATABASE as string,
-    ssl: 'require',
+    ssl: {
+      rejectUnauthorized: false,
+    },
   },
   migrations: {
     table: '__drizzle_migrations', // `__drizzle_migrations` by default
