@@ -18,19 +18,17 @@ export class ShiftService {
         startTime: `${today}T${data.startTime}.000Z`,
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         endTime: `${today}T${data.endTime}.000Z`,
-        idSede: data.idSede,
       },
     });
   }
 
   async findAll() {
-    return this.prisma.shift.findMany({ include: { sede: true } });
+    return this.prisma.shift.findMany({});
   }
 
   async findOne(id: number) {
     return this.prisma.shift.findUnique({
       where: { id },
-      include: { sede: true },
     });
   }
 
@@ -44,7 +42,6 @@ export class ShiftService {
         startTime: `${today}T${data.startTime}.000Z`,
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         endTime: `${today}T${data.endTime}.000Z`,
-        idSede: data.idSede,
       },
     });
   }

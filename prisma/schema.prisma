@@ -16,7 +16,7 @@ datasource db {
 // USERS
 
 model User {
-  id        String    @unique @db.Uuid
+  id        String    @id @default(uuid()) @db.Uuid
   email     String    @unique @db.VarChar(48)
   password  String?   @db.VarChar(128)
   isActive  Boolean   @default(true) @map("is_active")
@@ -44,7 +44,7 @@ model User {
 }
 
 model UserProfile {
-  id               String   @id @db.Uuid
+  id               String   @id @default(uuid()) @db.Uuid
   userId           String   @unique @map("user_id") @db.Uuid // Relación uno a uno con User
   dni              String   @unique @db.VarChar(10)
   firstName        String   @map("first_name") @db.VarChar(128)
@@ -64,7 +64,7 @@ model UserProfile {
 }
 
 model Teacher {
-  id             String       @id @unique @db.Uuid
+  id             String       @id @default(uuid()) @db.Uuid
   userId         String       @unique @map("user_id") @db.Uuid // Relación uno a uno con User 
   courseId       Int          @map("course_id") @db.SmallInt // Relación muchos a uno con Course
   maxHours       Int?         @map("max_hours") @db.SmallInt
@@ -90,7 +90,7 @@ enum JobShiftType {
 }
 
 model Supervisor {
-  id        String   @id @unique @db.Uuid
+  id        String   @id @default(uuid()) @db.Uuid
   userId    String   @unique @map("user_id") @db.Uuid // Relación uno a uno con User
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(3)
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(3)
@@ -103,7 +103,7 @@ model Supervisor {
 }
 
 model Monitor {
-  id           String   @id @db.Uuid
+  id           String   @id @default(uuid()) @db.Uuid
   userId       String   @unique @map("user_id") @db.Uuid // Relación uno a uno con User
   supervisorId String?  @map("supervisor_id") @db.Uuid // Relación muchos a uno con Supervisor
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamp(3)
@@ -184,7 +184,7 @@ model Shift {
 // SCHEDULES
 
 model Class {
-  id        String  @id @unique @db.Uuid
+  id        String  @id @default(uuid()) @db.Uuid
   name      String  @db.VarChar(48)
   idSede    Int     @map("id_sede") @db.SmallInt
   areaId    Int     @map("area_id") @db.SmallInt
