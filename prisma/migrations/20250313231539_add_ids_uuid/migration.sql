@@ -14,7 +14,9 @@ CREATE TABLE "users" (
     "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "last_login" TIMESTAMP(3),
     "google_id" VARCHAR(64),
-    "role" VARCHAR(48) NOT NULL
+    "role" VARCHAR(48) NOT NULL,
+
+    CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -158,9 +160,6 @@ CREATE TABLE "schedules" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "users_id_key" ON "users"("id");
-
--- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
@@ -179,13 +178,7 @@ CREATE UNIQUE INDEX "user_profiles_dni_key" ON "user_profiles"("dni");
 CREATE UNIQUE INDEX "user_profiles_personal_email_key" ON "user_profiles"("personal_email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "teachers_id_key" ON "teachers"("id");
-
--- CreateIndex
 CREATE UNIQUE INDEX "teachers_user_id_key" ON "teachers"("user_id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "supervisors_id_key" ON "supervisors"("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "supervisors_user_id_key" ON "supervisors"("user_id");
@@ -201,9 +194,6 @@ CREATE UNIQUE INDEX "area_course_hours_area_id_course_id_key" ON "area_course_ho
 
 -- CreateIndex
 CREATE UNIQUE INDEX "sedes_name_key" ON "sedes"("name");
-
--- CreateIndex
-CREATE UNIQUE INDEX "classes_id_key" ON "classes"("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "classes_monitor_id_key" ON "classes"("monitor_id");
