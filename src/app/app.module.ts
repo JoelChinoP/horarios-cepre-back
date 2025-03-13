@@ -31,13 +31,13 @@ import { CourseModule } from '@modules/academic/courses/course.module';
     DrizzleModule,
     ModulesModule,
     UsersModule,
-    AuthModule
+    AuthModule,
     SedeModule,
     ShiftModule,
     HourSessionModule,
     CourseModule,
   ],
-  controllers: [AppController,],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule implements NestModule {

@@ -16,6 +16,8 @@ export class DrizzleService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(DrizzleService.name);
 
   constructor() {
+    console.log('DB_HOST:', process.env.DB_HOST);
+
     this.pool = new Pool({
       //connectionString: process.env.DATABASE_URL,
       host: process.env.DB_HOST,

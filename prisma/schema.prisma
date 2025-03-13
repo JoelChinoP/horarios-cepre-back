@@ -16,7 +16,7 @@ datasource db {
 // USERS
 
 model User {
-  id        Int       @id @default(autoincrement())
+  id        String    @unique @db.Uuid
   email     String    @unique @db.VarChar(48)
   password  String?   @db.VarChar(128)
   isActive  Boolean   @default(true) @map("is_active")
@@ -25,7 +25,7 @@ model User {
   lastLogin DateTime? @map("last_login")
 
   // Campos para autenticación con Google
-  googleId  String?   @unique @map("google_id") @db.VarChar(64)
+  googleId String? @unique @map("google_id") @db.VarChar(64)
 
   // Relación muchos a uno con Role
   //roleId    Int       @map("role_id") @db.SmallInt
@@ -44,8 +44,8 @@ model User {
 }
 
 model UserProfile {
-  id               Int      @id @default(autoincrement())
-  userId           Int      @unique @map("user_id") // Relación uno a uno con User
+  id               String   @id @db.Uuid
+  userId           String   @unique @map("user_id") @db.Uuid // Relación uno a uno con User
   dni              String   @unique @db.VarChar(10)
   firstName        String   @map("first_name") @db.VarChar(128)
   lastName         String   @map("last_name") @db.VarChar(128)
@@ -64,8 +64,8 @@ model UserProfile {
 }
 
 model Teacher {
-  id             Int          @id @default(autoincrement())
-  userId         Int          @unique @map("user_id") // Relación uno a uno con User
+  id             String       @id @unique @db.Uuid
+  userId         String       @unique @map("user_id") @db.Uuid // Relación uno a uno con User 
   courseId       Int          @map("course_id") @db.SmallInt // Relación muchos a uno con Course
   maxHours       Int?         @map("max_hours") @db.SmallInt
   scheduledHours Int?         @map("scheduled_hours") @db.SmallInt
@@ -90,8 +90,8 @@ enum JobShiftType {
 }
 
 model Supervisor {
-  id        Int      @id @default(autoincrement()) @db.SmallInt
-  userId    Int      @unique @map("user_id") // Relación uno a uno con User
+  id        String   @id @unique @db.Uuid
+  userId    String   @unique @map("user_id") @db.Uuid // Relación uno a uno con User
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(3)
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(3)
 
@@ -103,9 +103,9 @@ model Supervisor {
 }
 
 model Monitor {
-  id           Int      @id @default(autoincrement()) @db.SmallInt
-  userId       Int      @unique @map("user_id") // Relación uno a uno con User
-  supervisorId Int?     @map("supervisor_id") @db.SmallInt // Relación muchos a uno con Supervisor
+  id           String   @id @db.Uuid
+  userId       String   @unique @map("user_id") @db.Uuid // Relación uno a uno con User
+  supervisorId String?  @map("supervisor_id") @db.Uuid // Relación muchos a uno con Supervisor
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamp(3)
   updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(3)
 
@@ -161,14 +161,13 @@ model Sede {
   id          Int     @id @default(autoincrement()) @db.SmallInt
   name        String  @db.VarChar(48)
   description String? @db.VarChar(255)
-  phone       String?  @db.VarChar(20)
+  phone       String? @db.VarChar(20)
 
-  Shifts Shift[] // Relación uno a muchos con Shift
+  classes Class[] // Relación uno a muchos con Shift
 
   @@unique([name])
   @@map("sedes")
 }
-
 
 model Shift {
   id        Int       @id @default(autoincrement()) @db.SmallInt
@@ -176,33 +175,32 @@ model Shift {
   startTime DateTime? @map("start_time") @db.Time
   endTime   DateTime? @map("end_time") @db.Time
 
-  // Relación muchos a uno con Sede
-  idSede Int  @map("id_sede") @db.SmallInt
-  sede   Sede @relation(fields: [idSede], references: [id], onDelete: Restrict)
-
   hourSessions HourSession[] // Relación uno a muchos con HourSession
   classes      Class[] // Relación uno a muchos con Class
 
-  @@index([idSede]) // Índice para optimizar consultas por sede
   @@map("shifts")
 }
 
 // SCHEDULES
 
 model Class {
-  id        Int    @id @default(autoincrement()) @db.SmallInt
-  name      String @db.VarChar(48)
-  areaId    Int    @map("area_id") @db.SmallInt
-  shiftId   Int    @map("shift_id") @db.SmallInt
-  monitorId Int?   @map("monitor_id") @db.SmallInt
-  capacity  Int    @default(100) @db.SmallInt
+  id        String  @id @unique @db.Uuid
+  name      String  @db.VarChar(48)
+  idSede    Int     @map("id_sede") @db.SmallInt
+  areaId    Int     @map("area_id") @db.SmallInt
+  shiftId   Int     @map("shift_id") @db.SmallInt
+  monitorId String? @unique @map("monitor_id") @db.Uuid
+  capacity  Int     @default(100) @db.SmallInt
+  urlMeet   String? @map("url_meet") @db.VarChar(48)
 
   // Relaciones
   schedules Schedule[]
+  sede      Sede       @relation(fields: [idSede], references: [id], onDelete: Restrict)
   area      Area       @relation(fields: [areaId], references: [id], onDelete: Restrict)
   shift     Shift      @relation(fields: [shiftId], references: [id], onDelete: Restrict)
   monitor   Monitor?   @relation(fields: [monitorId], references: [id], onDelete: SetNull)
 
+  @@index([idSede]) // Índice para optimizar consultas por sede
   @@map("classes")
 }
 
@@ -223,9 +221,9 @@ model HourSession {
 
 model Schedule {
   id            Int     @id @default(autoincrement())
-  classId       Int     @map("class_id") @db.SmallInt
+  classId       String  @map("class_id") @db.Uuid
   hourSessionId Int     @map("hour_session_id") @db.SmallInt
-  teacherId     Int?    @map("teacher_id")
+  teacherId     String? @map("teacher_id") @db.Uuid
   weekday       Weekday
 
   // Relaciones
@@ -233,6 +231,7 @@ model Schedule {
   hourSession HourSession @relation(fields: [hourSessionId], references: [id], onDelete: Restrict)
   teacher     Teacher?    @relation(fields: [teacherId], references: [id], onDelete: SetNull)
 
+  @@unique([classId, hourSessionId, teacherId, weekday]) // Índice para optimizar consultas y evitar duplicados
   @@map("schedules")
 }
 
