@@ -16,4 +16,8 @@ export default defineConfig({
     database: process.env.DB_DATABASE as string,
     ssl: 'require',
   },
+  migrations: {
+    table: '__drizzle_migrations', // `__drizzle_migrations` by default
+    schema: 'public', // used in PostgreSQL only, `drizzle` by default
+  },
 });
