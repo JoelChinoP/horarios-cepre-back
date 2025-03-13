@@ -23,6 +23,10 @@ import { ShiftModule } from '@modules/infrastructure/shifts/shift.module';
 import { HourSessionModule } from '@modules/schedules/hour-session/hour-session.module';
 import { CourseModule } from '@modules/academic/courses/course.module';
 
+// Roles and Permissions
+import { RolesModule } from '@modules/roles/roles.module';
+import { PermissionsModule } from '@modules/permissions/permissions.module';
+
 @Module({
   imports: [
     PrismaModule.forRoot({
@@ -31,6 +35,8 @@ import { CourseModule } from '@modules/academic/courses/course.module';
     DrizzleModule,
     ModulesModule,
     UsersModule,
+    RolesModule, // Agregar RolesModule
+    PermissionsModule, // Agregar PermissionsModule
     AuthModule,
     SedeModule,
     ShiftModule,
