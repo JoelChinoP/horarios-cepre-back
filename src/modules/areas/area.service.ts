@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@modules/db/prisma/prisma.service';
+import { PrismaService } from '@database/prisma/prisma.service';
 import { /*Area, AreaCourseHour,*/ Prisma } from '@prisma/client';
 
 @Injectable()
-export class AcademicService {
+export class CourseService {
   constructor(private prisma: PrismaService) {}
 
   // ─────── AREA CRUD ───────

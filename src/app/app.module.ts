@@ -9,23 +9,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 // Import Database Modules
-import { DrizzleModule } from '@modules/db/drizzle/drizzle.module';
-import { PrismaModule } from '@modules/db/prisma/prisma.module';
-import { SchemaMiddleware } from '@modules/db/prisma/prisma.middleware';
+import { DrizzleModule } from '@database/drizzle/drizzle.module';
+import { PrismaModule } from '@database/prisma/prisma.module';
+import { SchemaMiddleware } from '@database/prisma/prisma.middleware';
 
 // Modules
 import { ModulesModule } from '@modules/modules.module';
-
-import { UsersModule } from '@modules/users/users.module';
-import { AuthModule } from '@modules/auth/auth.module';
-import { SedeModule } from '@modules/infrastructure/sedes/sede.module';
-import { ShiftModule } from '@modules/infrastructure/shifts/shift.module';
-import { HourSessionModule } from '@modules/schedules/hour-session/hour-session.module';
-import { CourseModule } from '@modules/academic/courses/course.module';
-
-// Roles and Permissions
-import { RolesModule } from '@modules/roles/roles.module';
-import { PermissionsModule } from '@modules/permissions/permissions.module';
 
 @Module({
   imports: [
@@ -34,14 +23,6 @@ import { PermissionsModule } from '@modules/permissions/permissions.module';
     }),
     DrizzleModule,
     ModulesModule,
-    UsersModule,
-    RolesModule, // Agregar RolesModule
-    PermissionsModule, // Agregar PermissionsModule
-    AuthModule,
-    SedeModule,
-    ShiftModule,
-    HourSessionModule,
-    CourseModule,
   ],
   controllers: [AppController],
   providers: [AppService],

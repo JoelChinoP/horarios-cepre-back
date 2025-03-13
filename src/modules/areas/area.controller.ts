@@ -7,12 +7,12 @@ import {
   Param,
   Body,
 } from '@nestjs/common';
-import { AcademicService } from './academic.service';
+import { CourseService } from './area.service';
 import { Prisma } from '@prisma/client';
 
-@Controller('academic')
-export class AcademicController {
-  constructor(private readonly academicService: AcademicService) {}
+@Controller('course')
+export class CourseController {
+  constructor(private readonly academicService: CourseService) {}
 
   // ─────── AREA ───────
   @Post('areas')
