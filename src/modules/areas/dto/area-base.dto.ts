@@ -6,12 +6,15 @@ export class AreaBaseDto {
   @IsNotEmpty()
   @IsString()
   @MaxLength(48)
-  @ApiProperty({ example: 'Ingenierías' })
+  @ApiProperty({ example: 'Ingenierías', type: String })
   name!: string;
 
   @IsOptional()
   @IsString()
   @MaxLength(255)
-  @ApiProperty({ example: 'Área de ingenierías de la universidad' })
+  @ApiProperty({
+    example: 'Área de ingenierías de la universidad',
+    type: String,
+  })
   description?: string;
 }

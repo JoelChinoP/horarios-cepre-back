@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { AreaService } from './area.service';
 import { CreateAreaDto, UpdateAreaDto, AreaDto } from './dto';
+import { ApiBody, ApiCreatedResponse } from '@nestjs/swagger';
 //import { ApiResponse } from '@nestjs/swagger';
 
 @Controller('areas')
@@ -19,6 +20,10 @@ export class AreaController {
 
   // ─────── CRUD ───────
   @Post()
+  @ApiBody({ type: CreateAreaDto })
+  @ApiCreatedResponse({
+    description: 'The record area been successfully created.',
+  })
   @HttpCode(HttpStatus.CREATED)
   createArea(@Body() createAreaDto: CreateAreaDto): Promise<AreaDto> {
     return this.areaService.create(createAreaDto);
