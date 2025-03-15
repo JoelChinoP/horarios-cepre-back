@@ -7,7 +7,6 @@ import { AreaModule } from './areas/area.module';
 import { CourseModule } from './courses/course.module';
 import { ClassModule } from './classes/class.module';
 import { HourSessionModule } from './hour-session/hour-session.module';
-import { InfrastructureModule } from './infrastructure/infrastructure.module';
 import { ScheduleModule } from './schedules/schedules.module';
 import { SedeModule } from './sedes/sede.module';
 import { ShiftModule } from './shifts/shift.module';
@@ -24,7 +23,6 @@ import { PermissionsModule } from './permissions/permissions.module';
     CourseModule,
     ClassModule,
     HourSessionModule,
-    InfrastructureModule,
     ScheduleModule,
     SedeModule,
     ShiftModule,
@@ -41,7 +39,6 @@ import { PermissionsModule } from './permissions/permissions.module';
     CourseModule,
     ClassModule,
     HourSessionModule,
-    InfrastructureModule,
     ScheduleModule,
     SedeModule,
     ShiftModule,
