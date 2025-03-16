@@ -6,40 +6,47 @@ import {
   Delete,
   Param,
   Body,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { ScheduleService } from './schedules.service';
-import { Prisma } from '@prisma/client';
+import { ScheduleDto, CreateScheduleDto, UpdateScheduleDto } from './dto';
 
 @Controller('schedules')
 export class ScheduleController {
   constructor(private readonly scheduleService: ScheduleService) {}
 
-  // ─────── SCHEDULE ───────
+  // ─────── CRUD ───────
   @Post('schedules')
-  createSchedule(@Body() data: Prisma.ScheduleCreateInput) {
-    return this.scheduleService.createSchedule(data);
+  @HttpCode(HttpStatus.CREATED)
+  create(@Body() createScheduleDto: CreateScheduleDto): Promise<ScheduleDto> {
+    return this.scheduleService.create(createScheduleDto);
   }
 
   @Get('schedules')
-  findAllSchedules() {
-    return this.scheduleService.findAllSchedules();
+  @HttpCode(HttpStatus.OK)
+  findAll(): Promise<ScheduleDto[]> {
+    return this.scheduleService.findAll();
   }
 
   @Get('schedules/:id')
-  findOneSchedule(@Param('id') id: string) {
-    return this.scheduleService.findOneSchedule(+id);
+  @HttpCode(HttpStatus.OK)
+  findOne(@Param('id') id: string): Promise<ScheduleDto> {
+    return this.scheduleService.findOne(+id);
   }
 
   @Put('schedules/:id')
-  updateSchedule(
+  @HttpCode(HttpStatus.OK)
+  update(
     @Param('id') id: string,
-    @Body() data: Prisma.ScheduleUpdateInput,
-  ) {
-    return this.scheduleService.updateSchedule(+id, data);
+    @Body() UpdateScheduleDto: UpdateScheduleDto,
+  ): Promise<ScheduleDto> {
+    return this.scheduleService.update(+id, UpdateScheduleDto);
   }
 
   @Delete('schedules/:id')
-  deleteSchedule(@Param('id') id: string) {
-    return this.scheduleService.deleteSchedule(+id);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  delete(@Param('id') id: string): Promise<ScheduleDto> {
+    return this.scheduleService.delete(+id);
   }
 }

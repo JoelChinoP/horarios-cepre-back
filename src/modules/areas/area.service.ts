@@ -1,50 +1,52 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@database/prisma/prisma.service';
 import { /*Area, AreaCourseHour,*/ Prisma } from '@prisma/client';
 
+import { CreateAreaDto, UpdateAreaDto, AreaDto } from './dto';
+import { plainToInstance } from 'class-transformer';
+
 @Injectable()
-export class CourseService {
+export class AreaService {
   constructor(private prisma: PrismaService) {}
 
-  // ─────── AREA CRUD ───────
-  createArea(data: Prisma.AreaCreateInput) {
-    return this.prisma.area.create({ data });
+  // ─────── CRUD ───────
+  async create(createAreaDto: CreateAreaDto): Promise<AreaDto> {
+    const obj = await this.prisma.area.create({
+      data: createAreaDto,
+    });
+    return this.mapToAreaDto(obj);
   }
 
-  findAllAreas(params: Prisma.AreaFindManyArgs = {}) {
-    return this.prisma.area.findMany(params);
+  async findAll(params: Prisma.AreaFindManyArgs = {}): Promise<AreaDto[]> {
+    const objs = await this.prisma.area.findMany(params);
+    return objs.map((obj) => this.mapToAreaDto(obj));
   }
 
-  findOneArea(id: number) {
-    return this.prisma.area.findUnique({ where: { id } });
+  async findOne(id: number): Promise<AreaDto> {
+    const obj = await this.prisma.area.findUnique({ where: { id } });
+    if (!obj) {
+      throw new NotFoundException(`Area with ID ${id} not found`);
+    }
+    return this.mapToAreaDto(obj);
   }
 
-  updateArea(id: number, data: Prisma.AreaUpdateInput) {
-    return this.prisma.area.update({ where: { id }, data });
+  async update(id: number, updateAreaDto: UpdateAreaDto): Promise<AreaDto> {
+    const obj = await this.prisma.area.update({
+      where: { id },
+      data: updateAreaDto,
+    });
+    return this.mapToAreaDto(obj);
   }
 
-  deleteArea(id: number) {
-    return this.prisma.area.delete({ where: { id } });
+  async delete(id: number): Promise<AreaDto> {
+    const obj = await this.prisma.area.delete({
+      where: { id },
+    });
+    return this.mapToAreaDto(obj);
   }
 
-  // ─────── AREA COURSE HOUR CRUD ───────
-  createAreaCourseHour(data: Prisma.AreaCourseHourCreateInput) {
-    return this.prisma.areaCourseHour.create({ data });
-  }
-
-  findAllAreaCourseHours(params: Prisma.AreaCourseHourFindManyArgs = {}) {
-    return this.prisma.areaCourseHour.findMany(params);
-  }
-
-  findOneAreaCourseHour(id: number) {
-    return this.prisma.areaCourseHour.findUnique({ where: { id } });
-  }
-
-  updateAreaCourseHour(id: number, data: Prisma.AreaCourseHourUpdateInput) {
-    return this.prisma.areaCourseHour.update({ where: { id }, data });
-  }
-
-  deleteAreaCourseHour(id: number) {
-    return this.prisma.areaCourseHour.delete({ where: { id } });
+  // ─────── METODOS DE APOYO ───────
+  private mapToAreaDto(obj: any): AreaDto {
+    return plainToInstance(AreaDto, obj);
   }
 }

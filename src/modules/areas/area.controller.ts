@@ -6,66 +6,59 @@ import {
   Delete,
   Param,
   Body,
+  HttpCode,
+  HttpStatus,
+  ParseIntPipe,
+  UseInterceptors,
 } from '@nestjs/common';
-import { CourseService } from './area.service';
-import { Prisma } from '@prisma/client';
+import { AreaService } from './area.service';
+import { CreateAreaDto, UpdateAreaDto, AreaDto } from './dto';
+import { ApiOperation } from '@nestjs/swagger';
+import { PrismaExceptionInterceptor } from '@database/prisma/prisma-exception.interceptor';
+//import { ApiCreatedResponse } from '@nestjs/swagger';
+//import { ApiResponse } from '@nestjs/swagger';
 
-@Controller('course')
-export class CourseController {
-  constructor(private readonly academicService: CourseService) {}
+@Controller('areas')
+@UseInterceptors(PrismaExceptionInterceptor)
+export class AreaController {
+  constructor(private readonly areaService: AreaService) {}
 
-  // ─────── AREA ───────
-  @Post('areas')
-  createArea(@Body() data: Prisma.AreaCreateInput) {
-    return this.academicService.createArea(data);
+  // ─────── CRUD ───────
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ description: 'Create a new area' })
+  create(@Body() createAreaDto: CreateAreaDto): Promise<AreaDto> {
+    return this.areaService.create(createAreaDto);
   }
 
-  @Get('areas')
-  findAllAreas() {
-    return this.academicService.findAllAreas();
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ description: 'Get all areas' })
+  findAll(): Promise<AreaDto[]> {
+    return this.areaService.findAll();
   }
 
-  @Get('areas/:id')
-  findOneArea(@Param('id') id: string) {
-    return this.academicService.findOneArea(+id);
+  @Get(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ description: 'Get an area by id' })
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<AreaDto> {
+    return this.areaService.findOne(id);
   }
 
-  @Put('areas/:id')
-  updateArea(@Param('id') id: string, @Body() data: Prisma.AreaUpdateInput) {
-    return this.academicService.updateArea(+id, data);
+  @Put(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ description: 'Update an area by id' })
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateAreaDto: UpdateAreaDto,
+  ): Promise<AreaDto> {
+    return await this.areaService.update(id, updateAreaDto);
   }
 
-  @Delete('areas/:id')
-  deleteArea(@Param('id') id: string) {
-    return this.academicService.deleteArea(+id);
-  }
-
-  // ─────── AREA COURSE HOUR ───────
-  @Post('area-course-hours')
-  createAreaCourseHour(@Body() data: Prisma.AreaCourseHourCreateInput) {
-    return this.academicService.createAreaCourseHour(data);
-  }
-
-  @Get('area-course-hours')
-  findAllAreaCourseHours() {
-    return this.academicService.findAllAreaCourseHours();
-  }
-
-  @Get('area-course-hours/:id')
-  findOneAreaCourseHour(@Param('id') id: string) {
-    return this.academicService.findOneAreaCourseHour(+id);
-  }
-
-  @Put('area-course-hours/:id')
-  updateAreaCourseHour(
-    @Param('id') id: string,
-    @Body() data: Prisma.AreaCourseHourUpdateInput,
-  ) {
-    return this.academicService.updateAreaCourseHour(+id, data);
-  }
-
-  @Delete('area-course-hours/:id')
-  deleteAreaCourseHour(@Param('id') id: string) {
-    return this.academicService.deleteAreaCourseHour(+id);
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ description: 'Delete an area by id' })
+  delete(@Param('id', ParseIntPipe) id: number): Promise<AreaDto> {
+    return this.areaService.delete(id);
   }
 }

@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
-import { CourseController } from './area.controller';
-import { CourseService } from './area.service';
-
+import { AreaController } from './area.controller';
+import { AreaService } from './area.service';
 @Module({
-  controllers: [CourseController],
-  providers: [CourseService],
-  exports: [CourseService], //para otros modulos
+  controllers: [AreaController],
+  providers: [AreaService],
+  exports: [AreaService], //para otros modulos
 })
 export class AreaModule {}
