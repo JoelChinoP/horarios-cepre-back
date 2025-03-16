@@ -23,14 +23,14 @@ export class ShiftDto {
     example: '12:30:00',
   })
   @IsNotEmpty({ message: 'startTime es obligatorio.' })
-  startTime?: Date;
+  startTime: string;
 
   @ApiProperty({
     description: 'Hora de inicio de la sesión',
     example: '12:30:00',
   })
   @IsNotEmpty({ message: 'endTime es obligatorio.' })
-  endTime?: Date;
+  endTime: string;
 
   @ApiProperty({
     description: 'ID de la sede a la que pertenece el turno',

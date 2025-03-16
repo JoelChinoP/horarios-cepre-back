@@ -17,9 +17,7 @@ export class ShiftService {
       return await this.prisma.shift.create({
         data: {
           name: data.name,
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           startTime: new Date(`${today}T${data.startTime}Z`).toISOString(),
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           endTime: new Date(`${today}T${data.endTime}Z`).toISOString(),
         },
       });
@@ -61,12 +59,10 @@ export class ShiftService {
         data: {
           name: data.name ?? existingShift.name,
           startTime: data.startTime
-            ? // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-              new Date(`${today}T${data.startTime}Z`).toISOString()
+            ? new Date(`${today}T${data.startTime}Z`).toISOString()
             : existingShift.startTime,
           endTime: data.endTime
-            ? // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-              new Date(`${today}T${data.endTime}Z`).toISOString()
+            ? new Date(`${today}T${data.endTime}Z`).toISOString()
             : existingShift.endTime,
         },
       });
