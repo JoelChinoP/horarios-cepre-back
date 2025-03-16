@@ -1,8 +1,35 @@
-import { AreaCourseHourBaseDto } from './area-course-hour-base.dto';
-import { IsNumber } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsNumber, IsOptional, IsPositive } from 'class-validator';
 
-// DTO para respuesta que incluye el ID
-export class AreaCourseHourDto extends AreaCourseHourBaseDto {
+//CAMBIAR POR DTOS  A FUTURO
+import { Course, Area } from '@prisma/client';
+
+// DTO con todas las propiedades
+export class AreaCourseHourDto {
   @IsNumber()
+  @IsNotEmpty()
+  @ApiProperty({ example: 1012 })
   readonly id!: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  @ApiProperty({ example: 220 })
+  areaId!: number;
+
+  @IsOptional()
+  area?: Area; //CAMBIAR POR DTO A FUTURO
+
+  @IsNotEmpty()
+  @IsNumber()
+  @ApiProperty({ example: 125 })
+  courseId!: number;
+
+  @IsOptional()
+  course?: Course; //CAMBIAR POR DTO A FUTURO
+
+  @IsNotEmpty()
+  @IsNumber()
+  @IsPositive()
+  @ApiProperty({ example: 12 })
+  totalHours!: number;
 }

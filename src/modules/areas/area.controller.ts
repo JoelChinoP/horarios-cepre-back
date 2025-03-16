@@ -8,51 +8,57 @@ import {
   Body,
   HttpCode,
   HttpStatus,
+  ParseIntPipe,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AreaService } from './area.service';
 import { CreateAreaDto, UpdateAreaDto, AreaDto } from './dto';
-import { ApiBody, ApiCreatedResponse } from '@nestjs/swagger';
+import { ApiOperation } from '@nestjs/swagger';
+import { PrismaExceptionInterceptor } from '@database/prisma/prisma-exception.interceptor';
+//import { ApiCreatedResponse } from '@nestjs/swagger';
 //import { ApiResponse } from '@nestjs/swagger';
 
 @Controller('areas')
+@UseInterceptors(PrismaExceptionInterceptor)
 export class AreaController {
   constructor(private readonly areaService: AreaService) {}
 
   // ─────── CRUD ───────
   @Post()
-  @ApiBody({ type: CreateAreaDto })
-  @ApiCreatedResponse({
-    description: 'The record area been successfully created.',
-  })
   @HttpCode(HttpStatus.CREATED)
-  createArea(@Body() createAreaDto: CreateAreaDto): Promise<AreaDto> {
+  @ApiOperation({ description: 'Create a new area' })
+  create(@Body() createAreaDto: CreateAreaDto): Promise<AreaDto> {
     return this.areaService.create(createAreaDto);
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  findAllAreas(): Promise<AreaDto[]> {
+  @ApiOperation({ description: 'Get all areas' })
+  findAll(): Promise<AreaDto[]> {
     return this.areaService.findAll();
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  findOneArea(@Param('id') id: string): Promise<AreaDto> {
-    return this.areaService.findOne(+id);
+  @ApiOperation({ description: 'Get an area by id' })
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<AreaDto> {
+    return this.areaService.findOne(id);
   }
 
   @Put(':id')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ description: 'Update an area by id' })
   async update(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateAreaDto: UpdateAreaDto,
   ): Promise<AreaDto> {
-    return await this.areaService.update(+id, updateAreaDto);
+    return await this.areaService.update(id, updateAreaDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteArea(@Param('id') id: string): Promise<AreaDto> {
-    return this.areaService.delete(+id);
+  @ApiOperation({ description: 'Delete an area by id' })
+  delete(@Param('id', ParseIntPipe) id: number): Promise<AreaDto> {
+    return this.areaService.delete(id);
   }
 }

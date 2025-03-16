@@ -7,6 +7,7 @@ import {
   UpdateAreaCourseHourDto,
   AreaCourseHourDto,
 } from './dto';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class AreaCourseHourService {
@@ -16,72 +17,51 @@ export class AreaCourseHourService {
   async create(
     createAreaCourseHourDto: CreateAreaCourseHourDto,
   ): Promise<AreaCourseHourDto> {
-    const area = await this.prisma.areaCourseHour.create({
+    const obj = await this.prisma.areaCourseHour.create({
       data: createAreaCourseHourDto,
     });
-    return this.mapToAreaCourseHourDto(area);
+    return this.mapToAreaCourseHourDto(obj);
   }
 
   async findAll(): Promise<AreaCourseHourDto[]> {
-    const areas = await this.prisma.areaCourseHour.findMany();
-    return areas.map((area) => this.mapToAreaCourseHourDto(area));
+    const objs = await this.prisma.areaCourseHour.findMany({
+      include: { area: true, course: true },
+    });
+    return objs.map((data) => this.mapToAreaCourseHourDto(data));
   }
 
   async findOne(id: number): Promise<AreaCourseHourDto> {
-    const area = await this.prisma.areaCourseHour.findUnique({ where: { id } });
-    if (!area) {
+    const obj = await this.prisma.areaCourseHour.findUnique({
+      where: { id },
+      include: { area: true, course: true },
+    });
+    if (!obj) {
       throw new NotFoundException(`Area with ID ${id} not found`);
     }
-    return this.mapToAreaCourseHourDto(area);
+    return this.mapToAreaCourseHourDto(obj);
   }
 
   async update(
     id: number,
     updateAreaCourseHourDto: UpdateAreaCourseHourDto,
   ): Promise<AreaCourseHourDto> {
-    const area = await this.handlePrismaAction(
-      () =>
-        this.prisma.areaCourseHour.update({
-          where: { id },
-          data: updateAreaCourseHourDto,
-        }),
-      id,
-    );
-    return this.mapToAreaCourseHourDto(area);
+    const obj = await this.prisma.areaCourseHour.update({
+      where: { id },
+      include: { area: true, course: true },
+      data: updateAreaCourseHourDto,
+    });
+    return this.mapToAreaCourseHourDto(obj);
   }
 
   async delete(id: number): Promise<AreaCourseHourDto> {
-    const area = await this.handlePrismaAction(
-      () =>
-        this.prisma.areaCourseHour.delete({
-          where: { id },
-        }),
-      id,
-    );
-    return this.mapToAreaCourseHourDto(area);
+    const obj = await this.prisma.areaCourseHour.delete({
+      where: { id },
+    });
+    return this.mapToAreaCourseHourDto(obj);
   }
 
   // ─────── METODOS DE APOYO ───────
-  private mapToAreaCourseHourDto(area: any): AreaCourseHourDto {
-    return {
-      id: area.id,
-      areaId: area.areaId,
-      courseId: area.courseId,
-      totalHours: area.totalHours,
-    };
-  }
-
-  private async handlePrismaAction<T>(
-    action: () => Promise<T>,
-    id: number,
-  ): Promise<T> {
-    try {
-      return await action();
-    } catch (error) {
-      if (error.code === 'P2025') {
-        throw new NotFoundException(`Area with ID ${id} not found`);
-      }
-      throw error;
-    }
+  private mapToAreaCourseHourDto(obj: any): AreaCourseHourDto {
+    return plainToInstance(AreaCourseHourDto, obj);
   }
 }

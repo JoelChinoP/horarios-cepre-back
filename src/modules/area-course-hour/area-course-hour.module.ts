@@ -7,4 +7,4 @@ import { AreaCourseHourService } from './area-course-hour.service';
   providers: [AreaCourseHourService],
   exports: [AreaCourseHourService], //para otros modulos
 })
-export class AreaModule {}
+export class AreaCourseHourModule {}
