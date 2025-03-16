@@ -3,6 +3,7 @@ import { PrismaService } from '@database/prisma/prisma.service';
 import { /*class, ClassCourseHour,*/ Prisma } from '@prisma/client';
 
 import { CreateClassDto, UpdateClassDto, ClassDto } from './dto';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class ClassService {
@@ -53,16 +54,8 @@ export class ClassService {
   }
 
   // Metodo para mapear un objeto de tipo Class a un objeto de tipo ClassDto
-  private mapToClassDto(clas: any): ClassDto {
-    return {
-      id: clas.id,
-      name: clas.name,
-      idSede: clas.idSede,
-      areaId: clas.areaId,
-      shiftId: clas.shiftId,
-      capacity: clas.capacity,
-      urlMeet: clas.urlMeet,
-    };
+  private mapToClassDto(obj: any): ClassDto {
+    return plainToInstance(ClassDto, obj);
   }
 
   private async handlePrismaAction<T>(
