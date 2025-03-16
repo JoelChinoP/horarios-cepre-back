@@ -1,56 +1,114 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { PrismaService } from '@database/prisma/prisma.service';
-import { CreateHourSessionDto } from './dto/create-hour-session.dto';
-import { UpdateHourSessionDto } from './dto/update-hour-session.dto';
+import { CreateHourSessionDto, UpdateHourSessionDto } from './dto';
 
 @Injectable()
 export class HourSessionService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(data: CreateHourSessionDto) {
-    const today = new Date().toISOString().split('T')[0];
+  private calculateDuration(startTime: string, endTime: string): number {
+    const start = new Date(`1970-01-01T${startTime}Z`);
+    const end = new Date(`1970-01-01T${endTime}Z`);
+    return (end.getTime() - start.getTime()) / 60000; // Duración en minutos
+  }
 
-    return this.prisma.hourSession.create({
-      data: {
-        shiftId: data.shiftId,
-        period: data.period,
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        startTime: `${today}T${data.startTime}.000Z`,
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        endTime: `${today}T${data.endTime}.000Z`,
-        durationMinutes: data.durationMinutes,
-      },
-    });
+  async create(data: CreateHourSessionDto) {
+    try {
+      const durationMinutes = this.calculateDuration(
+        data.startTime.toISOString().substring(11, 16),
+        data.endTime.toISOString().substring(11, 16),
+      );
+
+      return await this.prisma.hourSession.create({
+        data: {
+          shiftId: data.shiftId,
+          period: data.period,
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          startTime: new Date(`1970-01-01T${data.startTime}Z`),
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          endTime: new Date(`1970-01-01T${data.endTime}Z`),
+          durationMinutes,
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        `Error al crear la sesión: ${error.message}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   async findAll() {
-    return this.prisma.hourSession.findMany({ include: { shift: true } });
+    try {
+      return await this.prisma.hourSession.findMany({
+        include: { shift: true },
+      });
+    } catch (error) {
+      throw new HttpException(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        `Error al obtener las sesiones: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async findOne(id: number) {
-    return this.prisma.hourSession.findUnique({
-      where: { id },
-      include: { shift: true },
-    });
+    try {
+      const session = await this.prisma.hourSession.findUnique({
+        where: { id },
+        include: { shift: true },
+      });
+      if (!session) {
+        throw new HttpException('Sesión no encontrada', HttpStatus.NOT_FOUND);
+      }
+      return session;
+    } catch (error) {
+      throw new HttpException(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        `Error al buscar la sesión: ${error.message}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   async update(id: number, data: UpdateHourSessionDto) {
-    const today = new Date().toISOString().split('T')[0];
-    return this.prisma.hourSession.update({
-      where: { id },
-      data: {
-        shiftId: data.shiftId,
-        period: data.period,
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        startTime: `${today}T${data.startTime}.000Z`,
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        endTime: `${today}T${data.endTime}.000Z`,
-        durationMinutes: data.durationMinutes,
-      },
-    });
+    try {
+      const durationMinutes = this.calculateDuration(
+        data.startTime?.toISOString().substring(11, 16) ?? '',
+        data.endTime?.toISOString().substring(11, 16) ?? '',
+      );
+
+      return await this.prisma.hourSession.update({
+        where: { id },
+        data: {
+          shiftId: data.shiftId,
+          period: data.period,
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          startTime: new Date(`1970-01-01T${data.startTime}Z`),
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          endTime: new Date(`1970-01-01T${data.endTime}Z`),
+          durationMinutes,
+        },
+      });
+    } catch (error) {
+      throw new HttpException(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        `Error al actualizar la sesión: ${error.message}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   async remove(id: number) {
-    return this.prisma.hourSession.delete({ where: { id } });
+    try {
+      return await this.prisma.hourSession.delete({ where: { id } });
+    } catch (error) {
+      throw new HttpException(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        `Error al eliminar la sesión: ${error.message}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }

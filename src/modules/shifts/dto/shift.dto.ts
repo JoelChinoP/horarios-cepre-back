@@ -1,5 +1,5 @@
-import { IsString, IsInt, IsOptional, IsNotEmpty, Min } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsString, IsInt, IsNotEmpty, Min } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class ShiftDto {
   @ApiProperty({
@@ -18,18 +18,18 @@ export class ShiftDto {
   @IsNotEmpty({ message: 'El nombre del turno no puede estar vacío.' })
   name: string;
 
-  @ApiPropertyOptional({
-    description: 'Hora de inicio del turno (formato ISO 8601)',
-    example: '2025-03-11T08:00:00.000Z',
+  @ApiProperty({
+    description: 'Hora de inicio de la sesión',
+    example: '12:30:00',
   })
-  @IsOptional()
+  @IsNotEmpty({ message: 'startTime es obligatorio.' })
   startTime?: Date;
 
-  @ApiPropertyOptional({
-    description: 'Hora de fin del turno (formato ISO 8601)',
-    example: '2025-03-11T16:00:00.000Z',
+  @ApiProperty({
+    description: 'Hora de inicio de la sesión',
+    example: '12:30:00',
   })
-  @IsOptional()
+  @IsNotEmpty({ message: 'endTime es obligatorio.' })
   endTime?: Date;
 
   @ApiProperty({
