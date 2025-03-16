@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { PrismaService } from '@database/prisma/prisma.service';
-import { CreateHourSessionDto, UpdateHourSessionDto } from './dto';
+import { CreateHourSessionDto, UpdateHourSessionDto } from './dto/index';
 
 @Injectable()
 export class HourSessionService {
@@ -9,24 +9,24 @@ export class HourSessionService {
   private calculateDuration(startTime: string, endTime: string): number {
     const start = new Date(`1970-01-01T${startTime}Z`);
     const end = new Date(`1970-01-01T${endTime}Z`);
+    console.log('start', start);
+    console.log('end', end);
     return (end.getTime() - start.getTime()) / 60000; // Duración en minutos
   }
 
   async create(data: CreateHourSessionDto) {
     try {
+      const today = new Date().toISOString().split('T')[0]; // Obtiene la fecha actual (YYYY-MM-DD)
       const durationMinutes = this.calculateDuration(
-        data.startTime.toISOString().substring(11, 16),
-        data.endTime.toISOString().substring(11, 16),
+        data.startTime,
+        data.endTime,
       );
-
       return await this.prisma.hourSession.create({
         data: {
           shiftId: data.shiftId,
           period: data.period,
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          startTime: new Date(`1970-01-01T${data.startTime}Z`),
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          endTime: new Date(`1970-01-01T${data.endTime}Z`),
+          startTime: new Date(`${today}T${data.startTime}Z`).toISOString(),
+          endTime: new Date(`${today}T${data.endTime}Z`).toISOString(),
           durationMinutes,
         },
       });
@@ -74,9 +74,19 @@ export class HourSessionService {
 
   async update(id: number, data: UpdateHourSessionDto) {
     try {
+      // Verificar si la sesión existe
+      const existingSession = await this.prisma.hourSession.findUnique({
+        where: { id },
+      });
+
+      if (!existingSession) {
+        throw new HttpException('Sesión no encontrada', HttpStatus.NOT_FOUND);
+      }
+
+      const today = new Date().toISOString().split('T')[0];
       const durationMinutes = this.calculateDuration(
-        data.startTime?.toISOString().substring(11, 16) ?? '',
-        data.endTime?.toISOString().substring(11, 16) ?? '',
+        data.startTime,
+        data.endTime,
       );
 
       return await this.prisma.hourSession.update({
@@ -84,16 +94,13 @@ export class HourSessionService {
         data: {
           shiftId: data.shiftId,
           period: data.period,
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          startTime: new Date(`1970-01-01T${data.startTime}Z`),
-          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          endTime: new Date(`1970-01-01T${data.endTime}Z`),
+          startTime: new Date(`${today}T${data.startTime}Z`).toISOString(),
+          endTime: new Date(`${today}T${data.endTime}Z`).toISOString(),
           durationMinutes,
         },
       });
     } catch (error) {
       throw new HttpException(
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         `Error al actualizar la sesión: ${error.message}`,
         HttpStatus.BAD_REQUEST,
       );

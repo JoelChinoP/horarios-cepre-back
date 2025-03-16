@@ -31,14 +31,14 @@ export class HourSessionDto {
     example: '12:30:00',
   })
   @IsNotEmpty({ message: 'startTime es obligatorio.' })
-  startTime: Date;
+  startTime: string;
 
   @ApiProperty({
     description: 'Hora de fin de la sesión',
     example: '13:10:00',
   })
   @IsNotEmpty({ message: 'endTime es obligatorio.' })
-  endTime: Date;
+  endTime: string;
 
   @ApiPropertyOptional({
     description: 'Duración en minutos de la sesión',

@@ -1,5 +1,8 @@
-import { OmitType, PartialType } from '@nestjs/swagger';
+import { OmitType } from '@nestjs/swagger';
 import { HourSessionDto } from './hour-session.dto';
+
+// Exportación de todos los DTOs
+export { HourSessionDto };
 
 // DTO base sin ID y sin duración
 export class HourSessionBaseDto extends OmitType(HourSessionDto, [
@@ -10,8 +13,5 @@ export class HourSessionBaseDto extends OmitType(HourSessionDto, [
 // DTO para crear una sesión de hora (sin ID y sin duración)
 export class CreateHourSessionDto extends HourSessionBaseDto {}
 
-// DTO para actualizar una sesión de hora (sin ID, sin duración y con campos opcionales)
-export class UpdateHourSessionDto extends PartialType(HourSessionBaseDto) {}
-
-// Exportación de todos los DTOs
-export { HourSessionDto };
+// DTO para actualizar una sesión de hora (con duracion)
+export class UpdateHourSessionDto extends HourSessionBaseDto {}
