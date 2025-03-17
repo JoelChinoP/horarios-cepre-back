@@ -5,15 +5,14 @@ import { AuthModule } from './auth/auth.module';
 
 import { AreaModule } from './areas/area.module';
 import { AreaCourseHourModule } from './area-course-hour/area-course-hour.module';
-import { CourseModule } from './courses/course.module';
 import { ClassModule } from './classes/class.module';
-import { CourseModule } from './courses/course.module';
 import { HourSessionModule } from './hour-session/hour-session.module';
 import { ScheduleModule } from './schedules/schedules.module';
 import { SedeModule } from './sedes/sede.module';
 import { ShiftModule } from './shifts/shift.module';
 import { RolesModule } from './roles/roles.module';
 import { PermissionsModule } from './permissions/permissions.module';
+import { CourseModule } from '@modules/courses/course.module';
 
 @Module({
   imports: [
@@ -24,7 +23,6 @@ import { PermissionsModule } from './permissions/permissions.module';
     AreaCourseHourModule,
     CourseModule,
     ClassModule,
-    CourseModule,
     HourSessionModule,
     ScheduleModule,
     SedeModule,
@@ -41,7 +39,6 @@ import { PermissionsModule } from './permissions/permissions.module';
     AreaCourseHourModule,
     CourseModule,
     ClassModule,
-    CourseModule,
     HourSessionModule,
     ScheduleModule,
     SedeModule,
