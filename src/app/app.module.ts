@@ -9,12 +9,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 // Import Database Modules
-import { DrizzleModule } from '@modules/db/drizzle/drizzle.module';
-import { PrismaModule } from '@modules/db/prisma/prisma.module';
-import { SchemaMiddleware } from '@modules/db/prisma/prisma.middleware';
+import { DrizzleModule } from '@database/drizzle/drizzle.module';
+import { PrismaModule } from '@database/prisma/prisma.module';
+import { SchemaMiddleware } from '@database/prisma/prisma.middleware';
 
-// Users
-import { UsersModule } from '@modules/users/users.module';
+// Modules
+import { ModulesModule } from '@modules/modules.module';
 
 @Module({
   imports: [
@@ -22,7 +22,7 @@ import { UsersModule } from '@modules/users/users.module';
       isGlobal: true, // para que no necesites importarlo en cada módulo
     }),
     DrizzleModule,
-    UsersModule,
+    ModulesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

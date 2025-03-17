@@ -42,7 +42,6 @@ export class PrismaService
       SchemaDefaultStore.getSchema();
 
     this.logger.debug(`Using schema: ${this.schema}`);
-    this.logger.debug(`***********************`);
 
     // Si ya tenemos el cliente en caché para este schema, usaremos sus métodos
     if (this.schema && SchemaDefaultStore.isValidSchema(this.schema)) {
