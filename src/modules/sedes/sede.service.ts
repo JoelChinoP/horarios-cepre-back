@@ -1,14 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@database/prisma/prisma.service';
-import { CreateSedeDto } from './dto/create-sede.dto';
-import { UpdateSedeDto } from './dto/update-sede.dto';
-
+import { CreateSedeDto, UpdateSedeDto } from './dto/index';
 @Injectable()
 export class SedeService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: CreateSedeDto) {
-    return this.prisma.sede.create({ data });
+    try {
+      return await this.prisma.sede.create({ data });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      throw new Error('Error al crear la sede');
+    }
   }
 
   async findAll() {
@@ -16,14 +19,29 @@ export class SedeService {
   }
 
   async findOne(id: number) {
-    return this.prisma.sede.findUnique({ where: { id } });
+    const sede = await this.prisma.sede.findUnique({ where: { id } });
+    if (!sede) {
+      throw new NotFoundException(`Sede con ID ${id} no encontrada`);
+    }
+    return sede;
   }
 
   async update(id: number, data: UpdateSedeDto) {
-    return this.prisma.sede.update({ where: { id }, data });
+    try {
+      return await this.prisma.sede.update({ where: { id }, data });
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      throw new NotFoundException(
+        `No se pudo actualizar, sede con ID ${id} no encontrada`,
+      );
+    }
   }
 
   async remove(id: number) {
+    const sede = await this.prisma.sede.findUnique({ where: { id } });
+    if (!sede) {
+      throw new NotFoundException(`Sede con ID ${id} no encontrada`);
+    }
     return this.prisma.sede.delete({ where: { id } });
   }
 }
