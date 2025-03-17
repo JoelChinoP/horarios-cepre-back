@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { AuthService } from '../auth.service';
-import { GoogleAuthDto } from '@modules/auth/dto/auth-google.dto';
+import { AuthResponseDto } from '@modules/auth/dto/auth-google.dto';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
@@ -21,8 +21,8 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     profile: any,
     done: VerifyCallback,
   ): Promise<any> {
-    const user: GoogleAuthDto =
+    const authResponse: AuthResponseDto =
       await this.authService.validateGoogleUser(profile);
-    return done(null, user);
+    return done(null, authResponse);
   }
 }

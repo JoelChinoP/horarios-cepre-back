@@ -1,12 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
-import { GoogleAuthDto } from '@modules/auth/dto/auth-google.dto';
+import { AuthResponseDto } from '@modules/auth/dto/auth-google.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private jwtService: JwtService,
+  ) {}
 
-  async validateGoogleUser(profile: any): Promise<GoogleAuthDto> {
+  async validateGoogleUser(profile: any): Promise<AuthResponseDto> {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const { id, emails } = profile;
 
@@ -29,12 +33,16 @@ export class AuthService {
         },
       });
     }
-
+    const payload = { email: user.email, sub: user.id, role: user.role };
+    const token = this.jwtService.sign(payload);
     return {
-      id: user.id,
-      email: user.email,
-      googleId: user.googleId || undefined,
-      role: user.role,
+      user: {
+        id: user.id,
+        email: user.email,
+        googleId: user.googleId || undefined,
+        role: user.role,
+      },
+      token,
     };
   }
 }

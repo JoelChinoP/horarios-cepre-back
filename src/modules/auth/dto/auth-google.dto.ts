@@ -16,3 +16,8 @@ export class GoogleAuthDto {
   @IsString()
   role: string;
 }
+
+export class AuthResponseDto {
+  user: GoogleAuthDto;
+  token: string;
+}

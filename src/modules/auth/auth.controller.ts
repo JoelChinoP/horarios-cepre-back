@@ -1,6 +1,6 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { GoogleAuthDto } from '@modules/auth/dto/auth-google.dto';
+import { AuthResponseDto } from '@modules/auth/dto/auth-google.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -12,7 +12,7 @@ export class AuthController {
 
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))
-  googleAuthRedirect(@Req() req): GoogleAuthDto {
+  googleAuthRedirect(@Req() req): AuthResponseDto {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-return
     return req.user;
   }
