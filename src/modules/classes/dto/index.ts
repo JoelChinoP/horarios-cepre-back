@@ -5,16 +5,23 @@ import { ClassDto } from './class.dto';
 export { ClassDto };
 
 // DTO con propiedades comunes o requeridas
-export class ClassBaseDto extends OmitType(ClassDto, ['id'] as const) {}
+export class ClassBaseDto extends OmitType(ClassDto, [
+  'areaId',
+  'shiftId',
+  'shiftId',
+  'monitorId',
+] as const) {}
 
 // DTO para crear un área
-export class CreateClassDto extends OmitType(ClassBaseDto, [
+export class CreateClassDto extends OmitType(ClassDto, [
+  'id',
   'sede',
   'area',
   'shift',
+  'monitor',
 ] as const) {}
 
 // DTO para actualizar un área
 export class UpdateClassDto extends PartialType(
-  OmitType(ClassBaseDto, ['sede', 'area', 'shift'] as const),
+  OmitType(ClassDto, ['id', 'sede', 'area', 'shift', 'monitor'] as const),
 ) {}

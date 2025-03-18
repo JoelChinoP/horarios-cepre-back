@@ -1,29 +1,33 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@database/prisma/prisma.service';
-import { Prisma } from '@prisma/client';
-import { ScheduleDto, CreateScheduleDto, UpdateScheduleDto } from './dto';
+import { ScheduleBaseDto, CreateScheduleDto, UpdateScheduleDto } from './dto';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class ScheduleService {
   constructor(private prisma: PrismaService) {}
 
   // ─────── CRUD ───────
-  async create(createScheduleDto: CreateScheduleDto): Promise<ScheduleDto> {
+  async create(createScheduleDto: CreateScheduleDto): Promise<ScheduleBaseDto> {
     const schedule = await this.prisma.schedule.create({
       data: createScheduleDto,
+      include: { clas: true, hourSession: true, teacher: true },
     });
     return this.mapToScheduleDto(schedule);
   }
 
-  async findAll(
-    params: Prisma.ScheduleFindManyArgs = {},
-  ): Promise<ScheduleDto[]> {
-    const schedule = await this.prisma.schedule.findMany(params);
+  async findAll(): Promise<ScheduleBaseDto[]> {
+    const schedule = await this.prisma.schedule.findMany({
+      include: { clas: true, hourSession: true, teacher: true },
+    });
     return schedule.map((data) => this.mapToScheduleDto(data));
   }
 
-  async findOne(id: number): Promise<ScheduleDto> {
-    const schedule = await this.prisma.schedule.findUnique({ where: { id } });
+  async findOne(id: number): Promise<ScheduleBaseDto> {
+    const schedule = await this.prisma.schedule.findUnique({
+      where: { id },
+      include: { clas: true, hourSession: true, teacher: true },
+    });
     if (!schedule) {
       throw new NotFoundException(`Schedule with ID ${id} not found`);
     }
@@ -33,51 +37,25 @@ export class ScheduleService {
   async update(
     id: number,
     updateScheduleDto: UpdateScheduleDto,
-  ): Promise<ScheduleDto> {
-    const clas = await this.handlePrismaAction(
-      () =>
-        this.prisma.schedule.update({
-          where: { id },
-          data: updateScheduleDto,
-        }),
-      id,
-    );
-    return this.mapToScheduleDto(clas);
+  ): Promise<ScheduleBaseDto> {
+    const schedule = await this.prisma.schedule.update({
+      where: { id },
+      data: updateScheduleDto,
+      include: { clas: true, hourSession: true, teacher: true },
+    });
+    return this.mapToScheduleDto(schedule);
   }
 
-  async delete(id: number): Promise<ScheduleDto> {
-    const clas = await this.handlePrismaAction(
-      () =>
-        this.prisma.schedule.delete({
-          where: { id },
-        }),
-      id,
-    );
-    return this.mapToScheduleDto(clas);
+  async delete(id: number): Promise<ScheduleBaseDto> {
+    const schedule = await this.prisma.schedule.delete({
+      where: { id },
+      include: { clas: true, hourSession: true, teacher: true },
+    });
+    return this.mapToScheduleDto(schedule);
   }
 
   // Metodo para mapear un objeto de tipo Schedule a un objeto de tipo ScheduleDto
-  private mapToScheduleDto(schedule: any): ScheduleDto {
-    return {
-      id: schedule.id,
-      classId: schedule.classId,
-      hourSessionId: schedule.hourSessionId,
-      teacherId: schedule.teacherId,
-      weekday: schedule.weekday,
-    };
-  }
-
-  private async handlePrismaAction<T>(
-    action: () => Promise<T>,
-    id: number,
-  ): Promise<T> {
-    try {
-      return await action();
-    } catch (error) {
-      if (error.code === 'P2025') {
-        throw new NotFoundException(`Class with ID ${id} not found`);
-      }
-      throw error;
-    }
+  private mapToScheduleDto(obj: any): ScheduleBaseDto {
+    return plainToInstance(ScheduleBaseDto, obj);
   }
 }

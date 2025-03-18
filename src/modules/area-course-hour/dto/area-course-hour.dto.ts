@@ -6,9 +6,9 @@ import { Course, Area } from '@prisma/client';
 
 // DTO con todas las propiedades
 export class AreaCourseHourDto {
-  @IsNumber()
   @IsNotEmpty()
-  @ApiProperty({ example: 1012 })
+  @IsNumber()
+  @ApiProperty({ example: 123 })
   readonly id!: number;
 
   @IsNotEmpty()
