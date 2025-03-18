@@ -15,6 +15,7 @@ import { PermissionsModule } from './permissions/permissions.module';
 import { CourseModule } from '@modules/courses/course.module';
 import { SupervisorModule } from '@modules/supervisors/supervisor.module';
 import { MonitorModule } from '@modules/monitors/monitor.module';
+import { TeacherModule } from '@modules/teachers/teacher.module';
 @Module({
   imports: [
     UsersModule,
@@ -34,6 +35,7 @@ import { MonitorModule } from '@modules/monitors/monitor.module';
 
     SupervisorModule,
     MonitorModule,
+    TeacherModule,
   ],
 
   exports: [
@@ -53,6 +55,7 @@ import { MonitorModule } from '@modules/monitors/monitor.module';
 
     SupervisorModule,
     MonitorModule,
+    TeacherModule,
   ],
 })
 export class ModulesModule {}
