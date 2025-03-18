@@ -1,8 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@database/prisma/prisma.service';
-import { /*Area, AreaCourseHour,*/ Prisma } from '@prisma/client';
-
-import { CreateAreaDto, UpdateAreaDto, AreaDto } from './dto';
+import { CreateAreaDto, UpdateAreaDto, AreaBaseDto } from './dto';
 import { plainToInstance } from 'class-transformer';
 
 @Injectable()
@@ -10,19 +8,19 @@ export class AreaService {
   constructor(private prisma: PrismaService) {}
 
   // ─────── CRUD ───────
-  async create(createAreaDto: CreateAreaDto): Promise<AreaDto> {
+  async create(createAreaDto: CreateAreaDto): Promise<AreaBaseDto> {
     const obj = await this.prisma.area.create({
       data: createAreaDto,
     });
     return this.mapToAreaDto(obj);
   }
 
-  async findAll(params: Prisma.AreaFindManyArgs = {}): Promise<AreaDto[]> {
-    const objs = await this.prisma.area.findMany(params);
+  async findAll(): Promise<AreaBaseDto[]> {
+    const objs = await this.prisma.area.findMany();
     return objs.map((obj) => this.mapToAreaDto(obj));
   }
 
-  async findOne(id: number): Promise<AreaDto> {
+  async findOne(id: number): Promise<AreaBaseDto> {
     const obj = await this.prisma.area.findUnique({ where: { id } });
     if (!obj) {
       throw new NotFoundException(`Area with ID ${id} not found`);
@@ -30,7 +28,7 @@ export class AreaService {
     return this.mapToAreaDto(obj);
   }
 
-  async update(id: number, updateAreaDto: UpdateAreaDto): Promise<AreaDto> {
+  async update(id: number, updateAreaDto: UpdateAreaDto): Promise<AreaBaseDto> {
     const obj = await this.prisma.area.update({
       where: { id },
       data: updateAreaDto,
@@ -38,7 +36,7 @@ export class AreaService {
     return this.mapToAreaDto(obj);
   }
 
-  async delete(id: number): Promise<AreaDto> {
+  async delete(id: number): Promise<AreaBaseDto> {
     const obj = await this.prisma.area.delete({
       where: { id },
     });
@@ -46,7 +44,7 @@ export class AreaService {
   }
 
   // ─────── METODOS DE APOYO ───────
-  private mapToAreaDto(obj: any): AreaDto {
-    return plainToInstance(AreaDto, obj);
+  private mapToAreaDto(obj: any): AreaBaseDto {
+    return plainToInstance(AreaBaseDto, obj);
   }
 }

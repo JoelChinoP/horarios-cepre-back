@@ -8,45 +8,73 @@ import {
   Body,
   HttpCode,
   HttpStatus,
+  UseInterceptors,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ScheduleService } from './schedules.service';
-import { ScheduleDto, CreateScheduleDto, UpdateScheduleDto } from './dto';
+import { ScheduleBaseDto, CreateScheduleDto, UpdateScheduleDto } from './dto';
+import { PrismaExceptionInterceptor } from '@database/prisma/prisma-exception.interceptor';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @Controller('schedules')
+@UseInterceptors(PrismaExceptionInterceptor)
+@ApiTags('Schedules')
 export class ScheduleController {
   constructor(private readonly scheduleService: ScheduleService) {}
 
   // ─────── CRUD ───────
-  @Post('schedules')
+  @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createScheduleDto: CreateScheduleDto): Promise<ScheduleDto> {
+  @ApiOperation({
+    summary: 'Crear un nuevo horario',
+    description: 'Create a new schedule',
+  })
+  create(
+    @Body() createScheduleDto: CreateScheduleDto,
+  ): Promise<ScheduleBaseDto> {
     return this.scheduleService.create(createScheduleDto);
   }
 
-  @Get('schedules')
+  @Get()
   @HttpCode(HttpStatus.OK)
-  findAll(): Promise<ScheduleDto[]> {
+  @ApiOperation({
+    summary: 'Obtener todos los horarios',
+    description: 'Get all schedules',
+  })
+  findAll(): Promise<ScheduleBaseDto[]> {
     return this.scheduleService.findAll();
   }
 
-  @Get('schedules/:id')
+  @Get(':id')
   @HttpCode(HttpStatus.OK)
-  findOne(@Param('id') id: string): Promise<ScheduleDto> {
-    return this.scheduleService.findOne(+id);
+  @ApiOperation({
+    summary: 'Obtener un horario por id',
+    description: 'Get a schedule by id',
+  })
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<ScheduleBaseDto> {
+    return this.scheduleService.findOne(id);
   }
 
-  @Put('schedules/:id')
+  @Put(':id')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Actualizar un horario por id',
+    description: 'Update a schedule by id',
+  })
   update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() UpdateScheduleDto: UpdateScheduleDto,
-  ): Promise<ScheduleDto> {
-    return this.scheduleService.update(+id, UpdateScheduleDto);
+  ): Promise<ScheduleBaseDto> {
+    return this.scheduleService.update(id, UpdateScheduleDto);
   }
 
-  @Delete('schedules/:id')
+  @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  delete(@Param('id') id: string): Promise<ScheduleDto> {
-    return this.scheduleService.delete(+id);
+  @ApiOperation({
+    summary: 'Eliminar un horario por id',
+    description: 'Delete a schedule by id',
+  })
+  delete(@Param('id', ParseIntPipe) id: number): Promise<ScheduleBaseDto> {
+    return this.scheduleService.delete(id);
   }
 }

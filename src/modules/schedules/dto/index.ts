@@ -1,14 +1,25 @@
-import { ScheduleBaseDto } from './schedule-base.dto';
+import { PartialType, OmitType } from '@nestjs/swagger';
+import { ScheduleDto } from './schedule.dto';
 
-// DTO para crear un área
-export class CreateScheduleDto extends ScheduleBaseDto {}
-
-// DTO para actualizar un área
-import { PartialType } from '@nestjs/mapped-types';
-export class UpdateScheduleDto extends PartialType(ScheduleBaseDto) {}
-
-// DTO para respuesta que incluye el ID
-export { ScheduleDto } from './schedule.dto';
+// DTO idéntico al ScheduleDto
+export { ScheduleDto };
 
 // DTO base con propiedades comunes
-export { ScheduleBaseDto };
+export class ScheduleBaseDto extends OmitType(ScheduleDto, [
+  'classId',
+  'hourSessionId',
+  'teacherId',
+]) {}
+
+// DTO para crear un área
+export class CreateScheduleDto extends OmitType(ScheduleDto, [
+  'id',
+  'clas',
+  'hourSession',
+  'teacher',
+] as const) {}
+
+// DTO para actualizar un área
+export class UpdateScheduleDto extends PartialType(
+  OmitType(ScheduleDto, ['id', 'clas', 'hourSession', 'teacher'] as const),
+) {}

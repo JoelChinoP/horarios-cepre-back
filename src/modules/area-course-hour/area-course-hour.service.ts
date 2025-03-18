@@ -5,7 +5,7 @@ import { PrismaService } from '@database/prisma/prisma.service';
 import {
   CreateAreaCourseHourDto,
   UpdateAreaCourseHourDto,
-  AreaCourseHourDto,
+  AreaCourseHourBaseDto,
 } from './dto';
 import { plainToInstance } from 'class-transformer';
 
@@ -16,21 +16,22 @@ export class AreaCourseHourService {
   // ─────── CRUD ───────
   async create(
     createAreaCourseHourDto: CreateAreaCourseHourDto,
-  ): Promise<AreaCourseHourDto> {
+  ): Promise<AreaCourseHourBaseDto> {
     const obj = await this.prisma.areaCourseHour.create({
       data: createAreaCourseHourDto,
+      include: { area: true, course: true },
     });
     return this.mapToAreaCourseHourDto(obj);
   }
 
-  async findAll(): Promise<AreaCourseHourDto[]> {
+  async findAll(): Promise<AreaCourseHourBaseDto[]> {
     const objs = await this.prisma.areaCourseHour.findMany({
       include: { area: true, course: true },
     });
     return objs.map((data) => this.mapToAreaCourseHourDto(data));
   }
 
-  async findOne(id: number): Promise<AreaCourseHourDto> {
+  async findOne(id: number): Promise<AreaCourseHourBaseDto> {
     const obj = await this.prisma.areaCourseHour.findUnique({
       where: { id },
       include: { area: true, course: true },
@@ -44,7 +45,7 @@ export class AreaCourseHourService {
   async update(
     id: number,
     updateAreaCourseHourDto: UpdateAreaCourseHourDto,
-  ): Promise<AreaCourseHourDto> {
+  ): Promise<AreaCourseHourBaseDto> {
     const obj = await this.prisma.areaCourseHour.update({
       where: { id },
       include: { area: true, course: true },
@@ -53,7 +54,7 @@ export class AreaCourseHourService {
     return this.mapToAreaCourseHourDto(obj);
   }
 
-  async delete(id: number): Promise<AreaCourseHourDto> {
+  async delete(id: number): Promise<AreaCourseHourBaseDto> {
     const obj = await this.prisma.areaCourseHour.delete({
       where: { id },
     });
@@ -61,7 +62,7 @@ export class AreaCourseHourService {
   }
 
   // ─────── METODOS DE APOYO ───────
-  private mapToAreaCourseHourDto(obj: any): AreaCourseHourDto {
-    return plainToInstance(AreaCourseHourDto, obj);
+  private mapToAreaCourseHourDto(obj: any): AreaCourseHourBaseDto {
+    return plainToInstance(AreaCourseHourBaseDto, obj);
   }
 }

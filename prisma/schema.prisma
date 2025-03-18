@@ -177,7 +177,7 @@ model Schedule {
   hourSessionId Int         @map("hour_session_id") @db.SmallInt
   teacherId     String?     @map("teacher_id") @db.Uuid
   weekday       Weekday
-  salon         Class       @relation(fields: [classId], references: [id])
+  clas          Class       @relation(fields: [classId], references: [id])
   hourSession   HourSession @relation(fields: [hourSessionId], references: [id])
   teacher       Teacher?    @relation(fields: [teacherId], references: [id])
 
@@ -193,11 +193,11 @@ enum JobShiftType {
 }
 
 enum Weekday {
-  Monday    @map("MONDAY")
-  Tuesday   @map("TUESDAY")
-  Wednesday @map("WEDNESDAY")
-  Thursday  @map("THURSDAY")
-  Friday    @map("FRIDAY")
-  Saturday  @map("SATURDAY")
-  Sunday    @map("SUNDAY")
+  Lunes     @map("MONDAY")
+  Martes    @map("TUESDAY")
+  Miercoles @map("WEDNESDAY")
+  Jueves    @map("THURSDAY")
+  Viernes   @map("FRIDAY")
+  Sabado    @map("SATURDAY")
+  Domingo   @map("SUNDAY")
 }

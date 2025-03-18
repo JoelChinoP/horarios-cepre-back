@@ -1,8 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@database/prisma/prisma.service';
-import { /*class, ClassCourseHour,*/ Prisma } from '@prisma/client';
 
-import { CreateClassDto, UpdateClassDto, ClassDto } from './dto';
+import { CreateClassDto, UpdateClassDto, ClassBaseDto } from './dto';
 import { plainToInstance } from 'class-transformer';
 
 @Injectable()
@@ -10,65 +9,54 @@ export class ClassService {
   constructor(private prisma: PrismaService) {}
 
   // ─────── CRUD ───────
-  async create(createClassDto: CreateClassDto): Promise<ClassDto> {
-    const clas = await this.prisma.class.create({
+  async create(createClassDto: CreateClassDto): Promise<ClassBaseDto> {
+    const obj = await this.prisma.class.create({
       data: createClassDto,
+      include: { sede: true, area: true, shift: true, monitor: true },
     });
-    return this.mapToClassDto(clas);
+    return this.mapToClassDto(obj);
   }
 
-  async findAll(params: Prisma.ClassFindManyArgs = {}): Promise<ClassDto[]> {
-    const classs = await this.prisma.class.findMany(params);
+  async findAll(): Promise<ClassBaseDto[]> {
+    const classs = await this.prisma.class.findMany({
+      include: { sede: true, area: true, shift: true, monitor: true },
+    });
     return classs.map((clas) => this.mapToClassDto(clas));
   }
 
-  async findOne(id: string): Promise<ClassDto> {
-    const clas = await this.prisma.class.findUnique({ where: { id } });
-    if (!clas) {
+  async findOne(id: string): Promise<ClassBaseDto> {
+    const obj = await this.prisma.class.findUnique({
+      where: { id },
+      include: { sede: true, area: true, shift: true, monitor: true },
+    });
+    if (!obj) {
       throw new NotFoundException(`Class with ID ${id} not found`);
     }
-    return this.mapToClassDto(clas);
+    return this.mapToClassDto(obj);
   }
 
-  async update(id: string, updateClassDto: UpdateClassDto): Promise<ClassDto> {
-    const clas = await this.handlePrismaAction(
-      () =>
-        this.prisma.class.update({
-          where: { id },
-          data: updateClassDto,
-        }),
-      id,
-    );
-    return this.mapToClassDto(clas);
+  async update(
+    id: string,
+    updateClassDto: UpdateClassDto,
+  ): Promise<ClassBaseDto> {
+    const obj = await this.prisma.class.update({
+      where: { id },
+      data: updateClassDto,
+      include: { sede: true, area: true, shift: true, monitor: true },
+    });
+    return this.mapToClassDto(obj);
   }
 
-  async delete(id: string): Promise<ClassDto> {
-    const clas = await this.handlePrismaAction(
-      () =>
-        this.prisma.class.delete({
-          where: { id },
-        }),
-      id,
-    );
-    return this.mapToClassDto(clas);
+  async delete(id: string): Promise<ClassBaseDto> {
+    const obj = await this.prisma.class.delete({
+      where: { id },
+      include: { sede: true, area: true, shift: true, monitor: true },
+    });
+    return this.mapToClassDto(obj);
   }
 
   // Metodo para mapear un objeto de tipo Class a un objeto de tipo ClassDto
-  private mapToClassDto(obj: any): ClassDto {
-    return plainToInstance(ClassDto, obj);
-  }
-
-  private async handlePrismaAction<T>(
-    action: () => Promise<T>,
-    id: string,
-  ): Promise<T> {
-    try {
-      return await action();
-    } catch (error) {
-      if (error.code === 'P2025') {
-        throw new NotFoundException(`Class with ID ${id} not found`);
-      }
-      throw error;
-    }
+  private mapToClassDto(obj: any): ClassBaseDto {
+    return plainToInstance(ClassBaseDto, obj);
   }
 }
