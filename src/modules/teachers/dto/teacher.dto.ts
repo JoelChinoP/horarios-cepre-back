@@ -9,8 +9,9 @@ import {
   IsBoolean,
   IsEnum,
 } from 'class-validator';
-import { User, Course, JobShiftType } from '@prisma/client';
+import { User, JobShiftType } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+import { CourseDto } from '@modules/courses/dto';
 
 // DTO para respuesta que incluye el ID
 export class TeacherDto {
@@ -25,7 +26,7 @@ export class TeacherDto {
   userId!: string;
 
   @IsOptional()
-  user: User; //CAMBIAR POR DTO A FUTURO 
+  user: User; //CAMBIAR POR DTO A FUTURO
 
   @IsNotEmpty()
   @IsNumber()
@@ -33,14 +34,14 @@ export class TeacherDto {
   courseId!: number;
 
   @IsOptional()
-  course: Course; //CAMBIAR POR DTO A FUTURO 
-  
+  course: CourseDto; //CAMBIAR POR DTO A FUTURO
+
   @IsNotEmpty()
   @IsNumber()
   @IsPositive()
   @ApiProperty({ example: 30 })
   maxHours: number;
-  
+
   @IsNotEmpty()
   @IsNumber()
   @IsPositive()
@@ -51,7 +52,10 @@ export class TeacherDto {
     description: 'Fecha de creación del teacher',
     example: '2023-10-01T12:00:00Z',
   })
-  @IsDateString({}, { message: 'La fecha de creación debe ser una cadena de fecha válida.' })
+  @IsDateString(
+    {},
+    { message: 'La fecha de creación debe ser una cadena de fecha válida.' },
+  )
   @IsNotEmpty({ message: 'La fecha de creación no puede estar vacía.' })
   createdAt: string;
 
@@ -59,10 +63,15 @@ export class TeacherDto {
     description: 'Fecha de última actualización del teacher',
     example: '2023-10-01T12:00:00Z',
   })
-  @IsDateString({}, { message: 'La fecha de actualización debe ser una cadena de fecha válida.' })
+  @IsDateString(
+    {},
+    {
+      message: 'La fecha de actualización debe ser una cadena de fecha válida.',
+    },
+  )
   @IsNotEmpty({ message: 'La fecha de actualización no puede estar vacía.' })
-  updatedAt: string;  
-  
+  updatedAt: string;
+
   @ApiProperty({
     description: 'inidica el docente esta activo',
     example: true,
