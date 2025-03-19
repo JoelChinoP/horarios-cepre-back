@@ -18,6 +18,5 @@ export class GoogleAuthDto {
 }
 
 export class AuthResponseDto {
-  user: GoogleAuthDto;
   token: string;
 }

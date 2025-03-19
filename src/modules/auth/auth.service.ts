@@ -27,15 +27,9 @@ export class AuthService {
         },
       });
     }
-    const payload = { email: user.email, sub: user.id, role: user.role };
+    const payload = { email: user.email, id: user.id, role: user.role };
     const token = this.jwtService.sign(payload);
     return {
-      user: {
-        id: user.id,
-        email: user.email,
-        googleId: user.googleId || undefined,
-        role: user.role,
-      },
       token,
     };
   }
