@@ -62,7 +62,7 @@ export class ClassService {
 
   async findAllTest(): Promise<ClassesForProfesor[]> {
     const classs = await this.prisma.class.findMany({
-      include: { sede: true, area: true, shift: true, monitor: true },
+      include: { area: true, shift: true, monitor: true, schedules: true },
     });
 
     return classs.map((clas) =>
