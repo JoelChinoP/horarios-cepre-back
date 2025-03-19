@@ -13,6 +13,7 @@ import { ShiftModule } from './shifts/shift.module';
 import { RolesModule } from './roles/roles.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { CourseModule } from '@modules/courses/course.module';
+import { UserProfileModule } from './user-profile/user-profile.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { CourseModule } from '@modules/courses/course.module';
 
     RolesModule,
     PermissionsModule,
+    UserProfileModule,
   ],
 
   exports: [
