@@ -60,7 +60,7 @@ export class AuthorizationGuard implements CanActivate {
   }
 
   private extractTokenFromHeader(request: Request): string | null {
-    const authHeader = request.headers['token'];
+    const authHeader = request.headers['authorization'];
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return null;
     }
