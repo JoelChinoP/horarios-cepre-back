@@ -5,8 +5,9 @@ import {
   IsUUID,
   IsDateString,
 } from 'class-validator';
-import { User, Supervisor } from '@prisma/client';
+import { User } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
+import { SupervisorDto } from '@modules/supervisors/dto';
 
 // DTO para respuesta que incluye el ID
 export class MonitorDto {
@@ -21,22 +22,24 @@ export class MonitorDto {
   userId!: string;
 
   @IsOptional()
-  user: User; //CAMBIAR POR DTO A FUTURO 
-  
-  
+  user: User; //CAMBIAR POR DTO A FUTURO
+
   @IsNotEmpty()
   @IsString()
   @IsUUID()
   supervisorId!: string;
 
   @IsOptional()
-  supervisor: Supervisor; //CAMBIAR POR DTO A FUTURO
+  supervisor: SupervisorDto; //CAMBIAR POR DTO A FUTURO
 
   @ApiProperty({
     description: 'Fecha de creación del supervisor',
     example: '2023-10-01T12:00:00Z',
   })
-  @IsDateString({}, { message: 'La fecha de creación debe ser una cadena de fecha válida.' })
+  @IsDateString(
+    {},
+    { message: 'La fecha de creación debe ser una cadena de fecha válida.' },
+  )
   @IsNotEmpty({ message: 'La fecha de creación no puede estar vacía.' })
   createdAt: string;
 
@@ -44,8 +47,12 @@ export class MonitorDto {
     description: 'Fecha de última actualización del supervisor',
     example: '2023-10-01T12:00:00Z',
   })
-  @IsDateString({}, { message: 'La fecha de actualización debe ser una cadena de fecha válida.' })
+  @IsDateString(
+    {},
+    {
+      message: 'La fecha de actualización debe ser una cadena de fecha válida.',
+    },
+  )
   @IsNotEmpty({ message: 'La fecha de actualización no puede estar vacía.' })
-  updatedAt: string;  
-  
+  updatedAt: string;
 }

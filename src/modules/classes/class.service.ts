@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@database/prisma/prisma.service';
 
-import { CreateClassDto, UpdateClassDto, ClassBaseDto } from './dto';
+import {CreateClassDto, UpdateClassDto, ClassBaseDto, ClassesForProfesor} from './dto';
 import { plainToInstance } from 'class-transformer';
 
 @Injectable()
@@ -58,5 +58,17 @@ export class ClassService {
   // Metodo para mapear un objeto de tipo Class a un objeto de tipo ClassDto
   private mapToClassDto(obj: any): ClassBaseDto {
     return plainToInstance(ClassBaseDto, obj);
+  }
+
+  async findAllTest(): Promise<ClassesForProfesor[]> {
+    const classs = await this.prisma.class.findMany({
+      include: { area: true, shift: true, monitor: true, schedules: true },
+    });
+
+    return classs.map((clas) =>
+      plainToInstance(ClassesForProfesor, clas, {
+        excludeExtraneousValues: true,
+      }),
+    );
   }
 }

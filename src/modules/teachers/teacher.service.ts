@@ -63,4 +63,8 @@ export class TeacherService {
   private mapToTeacherDto(obj: any): TeacherBaseDto {
     return plainToInstance(TeacherBaseDto, obj);
   }
+
+  //async getTeacherSchedules(teacherId: string) {
+  //  return Promise.resolve(undefined);
+  //}
 }
