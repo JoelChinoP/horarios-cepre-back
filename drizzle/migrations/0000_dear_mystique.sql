@@ -14,11 +14,14 @@ CREATE TABLE "observations" (
 );
 --> statement-breakpoint
 CREATE TABLE "permissions" (
-	"id" "smallserial" PRIMARY KEY NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"name" varchar(48) NOT NULL,
+	"path" varchar(128) NOT NULL,
+	"method_http" varchar(16) NOT NULL,
 	"description" varchar(255),
 	"created_at" timestamp (3) DEFAULT now() NOT NULL,
-	"updated_at" timestamp (3) DEFAULT now() NOT NULL
+	"updated_at" timestamp (3) DEFAULT now() NOT NULL,
+	CONSTRAINT "permissions_name_unique" UNIQUE("name")
 );
 --> statement-breakpoint
 CREATE TABLE "roles" (
@@ -30,7 +33,7 @@ CREATE TABLE "roles" (
 --> statement-breakpoint
 CREATE TABLE "roles_permissions" (
 	"role_id" smallint NOT NULL,
-	"permission_id" smallint NOT NULL,
+	"permission_id" integer NOT NULL,
 	"created_at" timestamp (3) DEFAULT now() NOT NULL,
 	CONSTRAINT "roles_permissions_role_id_permission_id_pk" PRIMARY KEY("role_id","permission_id")
 );
@@ -39,4 +42,5 @@ ALTER TABLE "observations" ADD CONSTRAINT "observations_admission_process_id_adm
 ALTER TABLE "roles_permissions" ADD CONSTRAINT "roles_permissions_role_id_roles_id_fk" FOREIGN KEY ("role_id") REFERENCES "public"."roles"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "roles_permissions" ADD CONSTRAINT "roles_permissions_permission_id_permissions_id_fk" FOREIGN KEY ("permission_id") REFERENCES "public"."permissions"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE UNIQUE INDEX "admision_process_name_unique" ON "admision_processes" USING btree ("name");--> statement-breakpoint
-CREATE UNIQUE INDEX "role_name_unique" ON "roles" USING btree ("name");
+CREATE UNIQUE INDEX "role_name_unique" ON "roles" USING btree ("name");--> statement-breakpoint
+CREATE UNIQUE INDEX "role_permission_unique" ON "roles_permissions" USING btree ("role_id","permission_id");

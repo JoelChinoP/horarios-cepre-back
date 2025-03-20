@@ -7,6 +7,7 @@ import {
   uniqueIndex,
   primaryKey,
   smallserial,
+  integer,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
@@ -68,8 +69,10 @@ export const rolesRelations = relations(roles, ({ many }) => ({
 
 // Modelo Permission
 export const permissions = pgTable('permissions', {
-  id: smallserial('id').primaryKey(),
-  name: varchar('name', { length: 48 }).notNull(),
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 48 }).notNull().unique(),
+  path: varchar('path', { length: 128 }).notNull(),
+  methodHttp: varchar('method_http', { length: 16 }).notNull(),
   description: varchar('description', { length: 255 }),
   createdAt: timestamp('created_at', { precision: 3 }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { precision: 3 }).defaultNow().notNull(),
@@ -87,12 +90,15 @@ export const rolesPermissions = pgTable(
     roleId: smallint('role_id')
       .notNull()
       .references(() => roles.id, { onDelete: 'cascade' }),
-    permissionId: smallint('permission_id')
+    permissionId: integer('permission_id')
       .notNull()
       .references(() => permissions.id, { onDelete: 'cascade' }),
     createdAt: timestamp('created_at', { precision: 3 }).defaultNow().notNull(),
   },
-  (table) => [primaryKey({ columns: [table.roleId, table.permissionId] })],
+  (table) => [
+    primaryKey({ columns: [table.roleId, table.permissionId] }),
+    uniqueIndex('role_permission_unique').on(table.roleId, table.permissionId),
+  ],
 );
 
 // Relaciones para RolePermission

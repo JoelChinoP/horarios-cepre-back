@@ -1,5 +1,5 @@
 {
-  "id": "4334d28c-28b0-46f9-9fcb-0a5779ee720a",
+  "id": "2ba5ab3f-f67d-4a2b-8903-17ea659f52bc",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -122,13 +122,25 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "smallserial",
+          "type": "serial",
           "primaryKey": true,
           "notNull": true
         },
         "name": {
           "name": "name",
           "type": "varchar(48)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "path": {
+          "name": "path",
+          "type": "varchar(128)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "method_http": {
+          "name": "method_http",
+          "type": "varchar(16)",
           "primaryKey": false,
           "notNull": true
         },
@@ -156,7 +168,15 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "permissions_name_unique": {
+          "name": "permissions_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "name"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -227,7 +247,7 @@
         },
         "permission_id": {
           "name": "permission_id",
-          "type": "smallint",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -239,7 +259,29 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "role_permission_unique": {
+          "name": "role_permission_unique",
+          "columns": [
+            {
+              "expression": "role_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "permission_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "roles_permissions_role_id_roles_id_fk": {
           "name": "roles_permissions_role_id_roles_id_fk",

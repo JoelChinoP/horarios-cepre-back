@@ -4,10 +4,17 @@ import { GoogleStrategy } from './strategies/google.strategy';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { PrismaService } from 'prisma/prisma.service';
+import { SyncAuthorizationService } from './sync-authorization.service';
+import { DiscoveryModule } from '@nestjs/core';
 
 @Module({
-  imports: [JwtModule.register({})],
-  providers: [AuthService, GoogleStrategy, PrismaService],
+  imports: [JwtModule.register({}), DiscoveryModule],
+  providers: [
+    AuthService,
+    GoogleStrategy,
+    PrismaService,
+    SyncAuthorizationService,
+  ],
   controllers: [AuthController],
 })
 export class AuthModule {}

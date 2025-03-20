@@ -15,18 +15,27 @@ import { AreaService } from './area.service';
 import { CreateAreaDto, UpdateAreaDto, AreaBaseDto } from './dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { PrismaExceptionInterceptor } from '@database/prisma/prisma-exception.interceptor';
+import {
+  Authorization,
+  Role,
+} from '@modules/auth/decorators/authorization.decorator';
 //import { ApiCreatedResponse } from '@nestjs/swagger';
 //import { ApiResponse } from '@nestjs/swagger';
 
 @Controller('areas')
-@UseInterceptors(PrismaExceptionInterceptor)
 @ApiTags('Areas')
+@UseInterceptors(PrismaExceptionInterceptor)
 export class AreaController {
   constructor(private readonly areaService: AreaService) {}
 
   // ─────── CRUD ───────
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @Authorization({
+    roles: [Role.TEACHER, Role.SUPERVISOR, Role.MONITOR],
+    permission: 'area.create',
+    description: 'Crear un nuevo area',
+  })
   @ApiOperation({
     summary: 'Crear un nuevo area',
     description: 'Create a new area',
@@ -37,6 +46,10 @@ export class AreaController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
+  @Authorization({
+    roles: [Role.TEACHER, Role.SUPERVISOR],
+    permission: 'area.list',
+  })
   @ApiOperation({
     summary: 'Obtener todas las areas',
     description: 'Get all areas',
@@ -47,6 +60,10 @@ export class AreaController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
+  @Authorization({
+    roles: [Role.SUPERVISOR],
+    permission: 'area.getById',
+  })
   @ApiOperation({
     summary: 'Obtener un area por id',
     description: 'Get an area by id',
@@ -57,6 +74,10 @@ export class AreaController {
 
   @Put(':id')
   @HttpCode(HttpStatus.OK)
+  @Authorization({
+    roles: [Role.TEACHER, Role.SUPERVISOR],
+    permission: 'area.updateById',
+  })
   @ApiOperation({
     summary: 'Actualizar un area por id',
     description: 'Update an area by id',
@@ -70,6 +91,10 @@ export class AreaController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @Authorization({
+    roles: [Role.MONITOR, Role.SUPERVISOR],
+    permission: 'area.deleteById',
+  })
   @ApiOperation({
     summary: 'Eliminar un area por id',
     description: 'Delete an area by id',
