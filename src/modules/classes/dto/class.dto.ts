@@ -1,6 +1,6 @@
 //CAMBIAR POR DTOS  A FUTURO
 import { ApiProperty } from '@nestjs/swagger';
-import { Area, Monitor, Sede, Shift } from '@prisma/client';
+import { Sede, Shift } from '@prisma/client';
 
 import {
   IsNotEmpty,
@@ -11,6 +11,9 @@ import {
   IsUUID,
   MaxLength,
 } from 'class-validator';
+import { ScheduleDto } from '@modules/schedules/dto';
+import { AreaDto } from '@modules/areas/dto';
+import { MonitorDto } from '@modules/monitors/dto';
 
 // DTO para respuesta que incluye el ID
 export class ClassDto {
@@ -39,7 +42,7 @@ export class ClassDto {
   areaId!: number;
 
   @IsOptional()
-  area: Area; //CAMBIAR POR DTO A FUTURO
+  area: AreaDto; //CAMBIAR POR DTO A FUTURO
 
   @IsNotEmpty()
   @IsNumber()
@@ -55,7 +58,7 @@ export class ClassDto {
   monitorId?: string;
 
   @IsOptional()
-  monitor: Monitor; //CAMBIAR POR DTO A FUTURO
+  monitor: MonitorDto; //CAMBIAR POR DTO A FUTURO
 
   @IsNotEmpty()
   @IsNumber()
@@ -68,4 +71,8 @@ export class ClassDto {
   @MaxLength(48)
   @ApiProperty({ example: 'https://meet.google.com/abc-123-def' })
   urlMeet?: string;
+
+  @IsOptional()
+  @ApiProperty({ type: [ScheduleDto] })
+  schedules?: ScheduleDto[]; // Agregamos el DTO en lugar de la entidad
 }

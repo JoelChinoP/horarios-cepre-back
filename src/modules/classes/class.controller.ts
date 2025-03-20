@@ -13,7 +13,12 @@ import {
 } from '@nestjs/common';
 import { ClassService } from './class.service';
 //import { Prisma } from '@prisma/client';
-import { CreateClassDto, UpdateClassDto, ClassBaseDto } from './dto';
+import {
+  CreateClassDto,
+  UpdateClassDto,
+  ClassBaseDto,
+  ClassesForProfesor,
+} from './dto';
 import { PrismaExceptionInterceptor } from '@database/prisma/prisma-exception.interceptor';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -42,6 +47,15 @@ export class ClassController {
   })
   findAll(): Promise<ClassBaseDto[]> {
     return this.classService.findAll();
+  }
+  @Get('test')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Obtener todas las clases',
+    description: 'Get all classes',
+  })
+  test(): Promise<ClassesForProfesor[]> {
+    return this.classService.findAllTest();
   }
 
   @Get(':id')
@@ -76,4 +90,6 @@ export class ClassController {
   deleteArea(@Param('id', ParseUUIDPipe) id: string): Promise<ClassBaseDto> {
     return this.classService.delete(id);
   }
+
+
 }

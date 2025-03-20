@@ -13,17 +13,21 @@ import { ShiftModule } from './shifts/shift.module';
 import { RolesModule } from './roles/roles.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { CourseModule } from '@modules/courses/course.module';
-
 // Guard de Autorización
 import { AuthorizationGuard } from './auth/guards/authorization.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 
+
+import { UserProfileModule } from './user-profile/user-profile.module';
+import { SupervisorModule } from '@modules/supervisors/supervisor.module';
+import { MonitorModule } from '@modules/monitors/monitor.module';
+import { TeacherModule } from '@modules/teachers/teacher.module';
+
 @Module({
   imports: [
     UsersModule,
     AuthModule,
-
     AreaModule,
     AreaCourseHourModule,
     CourseModule,
@@ -32,9 +36,12 @@ import { JwtService } from '@nestjs/jwt';
     ScheduleModule,
     SedeModule,
     ShiftModule,
-
     RolesModule,
     PermissionsModule,
+    UserProfileModule,
+    SupervisorModule,
+    MonitorModule,
+    TeacherModule,
   ],
 
   exports: [
@@ -52,6 +59,10 @@ import { JwtService } from '@nestjs/jwt';
 
     RolesModule,
     PermissionsModule,
+
+    SupervisorModule,
+    MonitorModule,
+    TeacherModule,
   ],
   providers: [
     JwtService,
