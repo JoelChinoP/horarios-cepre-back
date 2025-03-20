@@ -13,7 +13,9 @@ import { ShiftModule } from './shifts/shift.module';
 import { RolesModule } from './roles/roles.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { CourseModule } from '@modules/courses/course.module';
-
+import { SupervisorModule } from '@modules/supervisors/supervisor.module';
+import { MonitorModule } from '@modules/monitors/monitor.module';
+import { TeacherModule } from '@modules/teachers/teacher.module';
 @Module({
   imports: [
     UsersModule,
@@ -30,6 +32,10 @@ import { CourseModule } from '@modules/courses/course.module';
 
     RolesModule,
     PermissionsModule,
+
+    SupervisorModule,
+    MonitorModule,
+    TeacherModule,
   ],
 
   exports: [
@@ -46,6 +52,10 @@ import { CourseModule } from '@modules/courses/course.module';
 
     RolesModule,
     PermissionsModule,
+
+    SupervisorModule,
+    MonitorModule,
+    TeacherModule,
   ],
 })
 export class ModulesModule {}
