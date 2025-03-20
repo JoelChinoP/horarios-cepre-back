@@ -1,70 +1,105 @@
 import { Injectable } from '@nestjs/common';
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { Pool } from 'pg';
-import { roles, rolesPermissions, permissions } from 'drizzle/schema';
-import { eq, and } from 'drizzle-orm';
+import { DrizzleService } from '@database/drizzle/drizzle.service';
+import { permissions, roles, rolesPermissions } from 'drizzle/schema';
+import { eq } from 'drizzle-orm';
+import { CreateRoleDto, RoleResponseDto, UpdateRoleDto } from './dto/index';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class RolesService {
-  private db;
-
-  constructor() {
-    const pool = new Pool({
-      connectionString: process.env.DATABASE_URL,
-    });
-    this.db = drizzle(pool);
-  }
+  constructor(private drizzle: DrizzleService) {}
 
   // Crear un nuevo rol
-  async createRole(name: string, description?: string) {
-    return this.db.insert(roles).values({ name, description }).returning();
-  }
-
-  // Asignar un permiso a un rol
-  async assignPermissionToRole(roleId: number, permissionId: number) {
-    return this.db
-      .insert(rolesPermissions)
-      .values({ roleId, permissionId })
+  async create(createRoleDto: CreateRoleDto): Promise<RoleResponseDto> {
+    const obj = await this.drizzle.db
+      .insert(roles)
+      .values(createRoleDto)
       .returning();
-  }
-
-  // Obtener los permisos de un rol
-  async getRolePermissions(roleId: number) {
-    return this.db
-      .select()
-      .from(rolesPermissions)
-      .leftJoin(permissions, eq(rolesPermissions.permissionId, permissions.id))
-      .where(eq(rolesPermissions.roleId, roleId));
+    return this.mapToRoleDto(obj);
   }
 
   // Obtener todos los roles
-  async getAllRoles() {
-    return this.db.select().from(roles);
+  async getAll(): Promise<RoleResponseDto[]> {
+    const obj = await this.drizzle.db.select().from(roles);
+    return obj.map((item) => this.mapToRoleDto(item));
   }
-  //actualizar un rol
-  async updateRole(id: number, name: string, description?: string) {
-    return this.db
+
+  // Actualizar un rol
+  async update(
+    id: number,
+    updateRoleDto: UpdateRoleDto,
+  ): Promise<RoleResponseDto> {
+    const obj = await this.drizzle.db
       .update(roles)
-      .set({ name, description })
+      .set(updateRoleDto)
       .where(eq(roles.id, id))
       .returning();
+
+    return this.mapToRoleDto(obj);
   }
-  //eliminar un rol
-  async deleteRole(id: number) {
-    return this.db.delete(roles).where(eq(roles.id, id)).returning();
-  }
-  
-  // Quitar un permiso de un rol
-  async removePermissionFromRole(roleId: number, permissionId: number) {
-    return this.db
-      .delete(rolesPermissions)
-      .where(
-        and(
-          eq(rolesPermissions.roleId, roleId),
-          eq(rolesPermissions.permissionId, permissionId),
-        ),
-      )
+
+  // Eliminar un rol
+  async delete(id: number): Promise<RoleResponseDto> {
+    const obj = await this.drizzle.db
+      .delete(roles)
+      .where(eq(roles.id, id))
       .returning();
+    return this.mapToRoleDto(obj);
   }
-  
+
+  async getAllWithPermissions() {
+    // Realizar una sola consulta con JOIN para obtener roles y sus permisos
+    const rolesWithPermissions = await this.drizzle.db
+      .select({
+        roleId: roles.id,
+        roleName: roles.name,
+        permissionId: permissions.id,
+        permissionMethod: permissions.methodHttp,
+        permissionName: permissions.name,
+        permissionPath: permissions.path,
+      })
+      .from(roles)
+      .leftJoin(rolesPermissions, eq(roles.id, rolesPermissions.roleId))
+      .leftJoin(permissions, eq(rolesPermissions.permissionId, permissions.id));
+
+    // Agrupar los resultados por rol
+    const roleMap = new Map();
+
+    rolesWithPermissions.forEach((item) => {
+      const roleId = item.roleId;
+
+      if (!roleMap.has(roleId)) {
+        // Crear entrada para este rol si no existe
+        const role = {
+          id: item.roleId,
+          name: item.roleName,
+          permissions: [],
+        };
+        roleMap.set(roleId, this.mapToRoleDto(role));
+        roleMap.get(roleId).permissions = [];
+      }
+      // Agregar el permiso si existe y tiene un ID
+      if (item.permissionId) {
+        const permission = {
+          method_http: item.permissionMethod,
+          name: item.permissionName,
+          path: item.permissionPath,
+        };
+
+        const role = roleMap.get(roleId);
+        // Evitar duplicados comprobando si ya existe un permiso con el mismo ID
+        if (!role.permissions.some((p) => p.id === item.permissionId)) {
+          role.permissions.push(permission);
+        }
+      }
+    });
+
+    // Convertir el mapa a un array
+    return Array.from(roleMap.values());
+  }
+
+  // ─────── METODOS DE APOYO ───────
+  private mapToRoleDto(obj: any): RoleResponseDto {
+    return plainToInstance(RoleResponseDto, obj);
+  }
 }
