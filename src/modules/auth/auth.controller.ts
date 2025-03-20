@@ -2,8 +2,7 @@ import { Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { SyncAuthorizationService } from './sync-authorization.service';
 import { Unauthenticated } from './decorators/unauthenticated.decorator';
-import { AuthResponseDto } from '@modules/auth/dto/auth-google.dto';
-
+//import { AuthResponseDto } from '@modules/auth/dto/auth-google.dto';
 
 @Controller('auth')
 export class AuthController {

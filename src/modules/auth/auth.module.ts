@@ -8,7 +8,14 @@ import { SyncAuthorizationService } from './sync-authorization.service';
 import { DiscoveryModule } from '@nestjs/core';
 
 @Module({
-  imports: [JwtModule.register({}), DiscoveryModule],
+  imports: [
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '1h' },
+    }),
+    DiscoveryModule,
+  ],
+
   providers: [
     AuthService,
     GoogleStrategy,
