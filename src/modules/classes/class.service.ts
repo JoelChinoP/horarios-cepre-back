@@ -1,8 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@database/prisma/prisma.service';
 
-import {CreateClassDto, UpdateClassDto, ClassBaseDto, ClassesForProfesor} from './dto';
+import {
+  CreateClassDto,
+  UpdateClassDto,
+  ClassBaseDto,
+  ClassForTeacherDto,
+} from './dto';
 import { plainToInstance } from 'class-transformer';
+import { ScheduleForTeacherDto } from '@modules/schedules/dto';
+import { HourSessionForTeacherDto } from '@modules/hour-session/dto';
 
 @Injectable()
 export class ClassService {
@@ -60,15 +67,44 @@ export class ClassService {
     return plainToInstance(ClassBaseDto, obj);
   }
 
-  async findAllTest(): Promise<ClassesForProfesor[]> {
+  async findAllTest(): Promise<ClassForTeacherDto[]> {
     const classs = await this.prisma.class.findMany({
-      include: { area: true, shift: true, monitor: true, schedules: true },
+      include: {
+        area: true,
+        shift: true,
+        monitor: true,
+        schedules: { include: { hourSession: true } },
+      },
     });
 
-    return classs.map((clas) =>
-      plainToInstance(ClassesForProfesor, clas, {
-        excludeExtraneousValues: true,
-      }),
-    );
+    console.log('Datos obtenidos de la BD:', classs); // Debugging
+
+    return classs.map((clas) => {
+      return plainToInstance(
+        ClassForTeacherDto,
+        {
+          ...clas,
+          schedules: clas.schedules
+            ? clas.schedules.map((s) =>
+                plainToInstance(
+                  ScheduleForTeacherDto,
+                  {
+                    ...s,
+                    hourSession: s.hourSession
+                      ? plainToInstance(
+                          HourSessionForTeacherDto,
+                          s.hourSession,
+                          { excludeExtraneousValues: true },
+                        )
+                      : null,
+                  },
+                  { excludeExtraneousValues: true },
+                ),
+              )
+            : [],
+        },
+        { excludeExtraneousValues: true },
+      );
+    });
   }
 }

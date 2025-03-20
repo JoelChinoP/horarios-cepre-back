@@ -17,7 +17,7 @@ import {
   CreateClassDto,
   UpdateClassDto,
   ClassBaseDto,
-  ClassesForProfesor,
+  ClassForTeacherDto,
 } from './dto';
 import { PrismaExceptionInterceptor } from '@database/prisma/prisma-exception.interceptor';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -54,7 +54,7 @@ export class ClassController {
     summary: 'Obtener todas las clases',
     description: 'Get all classes',
   })
-  test(): Promise<ClassesForProfesor[]> {
+  test(): Promise<ClassForTeacherDto[]> {
     return this.classService.findAllTest();
   }
 
@@ -90,6 +90,4 @@ export class ClassController {
   deleteArea(@Param('id', ParseUUIDPipe) id: string): Promise<ClassBaseDto> {
     return this.classService.delete(id);
   }
-
-
 }
