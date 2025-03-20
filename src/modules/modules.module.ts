@@ -14,7 +14,9 @@ import { RolesModule } from './roles/roles.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { CourseModule } from '@modules/courses/course.module';
 import { UserProfileModule } from './user-profile/user-profile.module';
-
+import { SupervisorModule } from '@modules/supervisors/supervisor.module';
+import { MonitorModule } from '@modules/monitors/monitor.module';
+import { TeacherModule } from '@modules/teachers/teacher.module';
 @Module({
   imports: [
     UsersModule,
@@ -28,10 +30,12 @@ import { UserProfileModule } from './user-profile/user-profile.module';
     ScheduleModule,
     SedeModule,
     ShiftModule,
-
     RolesModule,
     PermissionsModule,
     UserProfileModule,
+    SupervisorModule,
+    MonitorModule,
+    TeacherModule,
   ],
 
   exports: [
@@ -48,6 +52,10 @@ import { UserProfileModule } from './user-profile/user-profile.module';
 
     RolesModule,
     PermissionsModule,
+
+    SupervisorModule,
+    MonitorModule,
+    TeacherModule,
   ],
 })
 export class ModulesModule {}

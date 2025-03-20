@@ -1,8 +1,52 @@
-import { ScheduleBaseDto } from './schedule-base.dto';
-import { IsNumber } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
+import { Weekday } from '@prisma/client';
+import { ApiProperty } from '@nestjs/swagger';
+import { ClassDto } from '@modules/classes/dto';
+import { HourSessionDto } from '@modules/hour-session/dto';
+import { TeacherDto } from '@modules/teachers/dto';
 
 // DTO para respuesta que incluye el ID
-export class ScheduleDto extends ScheduleBaseDto {
+export class ScheduleDto {
+  @IsNotEmpty()
   @IsNumber()
+  @ApiProperty({ example: 123 })
   readonly id!: number;
+
+  @IsNotEmpty()
+  @IsString()
+  @IsUUID()
+  classId!: string;
+
+  @IsOptional()
+  clas: ClassDto; //CAMBIAR POR DTO A FUTURO
+
+  @IsNotEmpty()
+  @IsNumber()
+  @ApiProperty({ example: 456 })
+  hourSessionId!: number;
+
+  @IsOptional()
+  hourSession: HourSessionDto; //CAMBIAR POR DTO A FUTURO
+
+  @IsNotEmpty()
+  @IsString()
+  @IsUUID()
+  teacherId!: string;
+
+  @IsOptional()
+  teacher: TeacherDto; //CAMBIAR POR DTO A FUTURO
+
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(Weekday)
+  @ApiProperty({ example: 'Lunes' })
+  weekday!: Weekday;
 }

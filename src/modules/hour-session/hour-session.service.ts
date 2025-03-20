@@ -101,6 +101,7 @@ export class HourSessionService {
       });
     } catch (error) {
       throw new HttpException(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         `Error al actualizar la sesión: ${error.message}`,
         HttpStatus.BAD_REQUEST,
       );

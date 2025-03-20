@@ -21,7 +21,18 @@ async function bootstrap() {
 
   //Configuración de prefijo global
   app.setGlobalPrefix('api');
-  app.useGlobalPipes(new ValidationPipe());
+
+  //Configuración de validación global
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // Elimina propiedades que no están en el DTO
+      forbidNonWhitelisted: true, // Rechaza la solicitud si hay propiedades adicionales
+      transform: true, // Transforma el payload a la instancia de la clase DTO
+      //transformOptions: {
+      //  enableImplicitConversion: true, // Permite conversiones implícitas de tipos
+      //},
+    }),
+  );
 
   await app.listen(process.env.PORT ?? 3000);
 }
