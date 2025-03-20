@@ -14,6 +14,11 @@ import { RolesModule } from './roles/roles.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { CourseModule } from '@modules/courses/course.module';
 
+// Guard de Autorización
+import { AuthorizationGuard } from './auth/guards/authorization.guard';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtService } from '@nestjs/jwt';
+
 @Module({
   imports: [
     UsersModule,
@@ -35,6 +40,7 @@ import { CourseModule } from '@modules/courses/course.module';
   exports: [
     UsersModule,
     AuthModule,
+
     AreaModule,
     AreaCourseHourModule,
     CourseModule,
@@ -46,6 +52,13 @@ import { CourseModule } from '@modules/courses/course.module';
 
     RolesModule,
     PermissionsModule,
+  ],
+  providers: [
+    JwtService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthorizationGuard,
+    },
   ],
 })
 export class ModulesModule {}

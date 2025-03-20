@@ -16,5 +16,6 @@ import { DiscoveryModule } from '@nestjs/core';
     SyncAuthorizationService,
   ],
   controllers: [AuthController],
+  exports: [AuthService],
 })
 export class AuthModule {}

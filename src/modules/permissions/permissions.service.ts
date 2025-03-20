@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { permissions } from 'drizzle/schema';
-import { eq } from 'drizzle-orm';
+import { permissions, roles, rolesPermissions } from 'drizzle/schema';
+import { and, eq } from 'drizzle-orm';
 import { DrizzleService } from '@database/drizzle/drizzle.service';
 import {
   CreatePermissionDto,
@@ -56,5 +56,23 @@ export class PermissionsService {
   // ─────── METODOS DE APOYO ───────
   private mapToPermissionDto(obj: any): PermissionResponseDto {
     return plainToInstance(PermissionResponseDto, obj);
+  }
+
+  //*** Considerar mejorarlo con REDIS
+  async checkPermission(
+    roleName: string,
+    permissionName: string,
+  ): Promise<boolean> {
+    const result = await this.drizzle.db
+      .select()
+      .from(rolesPermissions)
+      .innerJoin(roles, eq(rolesPermissions.roleId, roles.id))
+      .innerJoin(permissions, eq(rolesPermissions.permissionId, permissions.id))
+      .where(
+        and(eq(roles.name, roleName), eq(permissions.name, permissionName)),
+      )
+      .limit(1);
+
+    return result.length > 0;
   }
 }
