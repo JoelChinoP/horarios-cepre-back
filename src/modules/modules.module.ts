@@ -13,6 +13,7 @@ import { ShiftModule } from './shifts/shift.module';
 import { RolesModule } from './roles/roles.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { CourseModule } from '@modules/courses/course.module';
+import { UserProfileModule } from './user-profile/user-profile.module';
 import { SupervisorModule } from '@modules/supervisors/supervisor.module';
 import { MonitorModule } from '@modules/monitors/monitor.module';
 import { TeacherModule } from '@modules/teachers/teacher.module';
@@ -29,10 +30,9 @@ import { TeacherModule } from '@modules/teachers/teacher.module';
     ScheduleModule,
     SedeModule,
     ShiftModule,
-
     RolesModule,
     PermissionsModule,
-
+    UserProfileModule,
     SupervisorModule,
     MonitorModule,
     TeacherModule,
