@@ -130,10 +130,16 @@ export class SyncAuthorizationService {
         .forEach((methodName: string) => {
           const methodHandler = prototype[methodName];
 
-          let controllerPath = this.reflector.get(PATH_METADATA, instance.constructor);
-          let methodPath = this.reflector.get(PATH_METADATA, methodHandler);
-          let type = this.reflector.get(METHOD_METADATA, methodHandler);
-          let decorator = this.reflector.get(AUTHORIZATION_METADATA_KEY, methodHandler);
+          const controllerPath = this.reflector.get(
+            PATH_METADATA,
+            instance.constructor,
+          );
+          const methodPath = this.reflector.get(PATH_METADATA, methodHandler);
+          const type = this.reflector.get(METHOD_METADATA, methodHandler);
+          const decorator = this.reflector.get(
+            AUTHORIZATION_METADATA_KEY,
+            methodHandler,
+          );
 
           if (decorator) {
             endpoints.push({
@@ -152,7 +158,7 @@ export class SyncAuthorizationService {
 
   private getFullPath(controllerPath: string, methodPath: string): string {
     const normControllerPath = controllerPath.startsWith('/')
-      ? controllerPath 
+      ? controllerPath
       : `/${controllerPath}`;
 
     const normMethodPath = methodPath.startsWith('/')
