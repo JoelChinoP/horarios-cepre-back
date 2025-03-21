@@ -10,6 +10,9 @@ import {
   HttpCode,
   UseInterceptors,
   ParseUUIDPipe,
+  UseGuards,
+  Req,
+  BadRequestException,
 } from '@nestjs/common';
 import { ClassService } from './class.service';
 //import { Prisma } from '@prisma/client';
@@ -21,11 +24,16 @@ import {
 } from './dto';
 import { PrismaExceptionInterceptor } from '@database/prisma/prisma-exception.interceptor';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import {Authorization, Role} from "@modules/auth/decorators/authorization.decorator";
+import {
+  Authorization,
+  Role,
+} from '@modules/auth/decorators/authorization.decorator';
+import { JwtAuthGuard } from '@modules/auth/guards/jwt-auth.guard';
 
 @Controller('classes')
 @UseInterceptors(PrismaExceptionInterceptor)
 @ApiTags('Classes')
+@UseGuards(JwtAuthGuard)
 export class ClassController {
   constructor(private readonly classService: ClassService) {}
 
@@ -59,19 +67,26 @@ export class ClassController {
   findAll(): Promise<ClassBaseDto[]> {
     return this.classService.findAll();
   }
+
   @Authorization({
-    description: 'GAA',
+    description: 'Devuelve la clase del profesor',
     permission: 'userProfile.create',
     roles: [Role.ADMIN],
   })
-  @Get('test')
+  @Get('getClassOfTeacher')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Obtener la clase del profito',
     description: 'Get all classes',
   })
-  test(): Promise<ClassForTeacherDto[]> {
-    return this.classService.findAllTest();
+  getClassOfTeacher(@Req() req): Promise<ClassForTeacherDto[]> {
+    console.log('Usuario autenticado:', req.user); // Debugging
+    const userId = req.user?.userId; // Verifica que exista
+
+    if (!userId) {
+      throw new BadRequestException('No se encontró el userId en la solicitud');
+    }
+    return this.classService.findClassesOfTeacher(userId);
   }
 
   @Get(':id')
