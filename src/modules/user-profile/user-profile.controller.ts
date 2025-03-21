@@ -1,5 +1,4 @@
 import {
-
   BadRequestException,
   Body,
   Controller,
@@ -7,8 +6,9 @@ import {
   Get,
   Param,
   Patch,
-  Post, Req, UseGuards,
-
+  Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { UserProfileService } from './user-profile.service';
 import { CreateUserProfileDto } from './dto/create-user-profile.dto';

@@ -19,6 +19,7 @@ export class ClassForTeacherDto {
 
   @Expose()
   @IsOptional()
+  @ApiProperty({ type: [MonitorForTeacherDto] })
   monitor: MonitorForTeacherDto;
 
   @Expose()

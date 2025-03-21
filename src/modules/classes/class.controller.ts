@@ -21,6 +21,7 @@ import {
 } from './dto';
 import { PrismaExceptionInterceptor } from '@database/prisma/prisma-exception.interceptor';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import {Authorization, Role} from "@modules/auth/decorators/authorization.decorator";
 
 @Controller('classes')
 @UseInterceptors(PrismaExceptionInterceptor)
@@ -29,6 +30,11 @@ export class ClassController {
   constructor(private readonly classService: ClassService) {}
 
   // ─────── CRUD ───────
+  @Authorization({
+    description: 'GAA',
+    permission: 'userProfile.create',
+    roles: [Role.ADMIN],
+  })
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
@@ -39,6 +45,11 @@ export class ClassController {
     return this.classService.create(createClassDto);
   }
 
+  @Authorization({
+    description: 'GAA',
+    permission: 'userProfile.create',
+    roles: [Role.ADMIN],
+  })
   @Get()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -48,10 +59,15 @@ export class ClassController {
   findAll(): Promise<ClassBaseDto[]> {
     return this.classService.findAll();
   }
+  @Authorization({
+    description: 'GAA',
+    permission: 'userProfile.create',
+    roles: [Role.ADMIN],
+  })
   @Get('test')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: 'Obtener todas las clases',
+    summary: 'Obtener la clase del profito',
     description: 'Get all classes',
   })
   test(): Promise<ClassForTeacherDto[]> {
