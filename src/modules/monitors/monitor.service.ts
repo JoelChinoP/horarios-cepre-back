@@ -2,6 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@database/prisma/prisma.service';
 import { CreateMonitorDto, UpdateMonitorDto, MonitorBaseDto, } from './dto';
 import { plainToInstance } from 'class-transformer';
+import { ScheduleDto } from './dto/schedule.dto';
+
 
 @Injectable()
 export class MonitorService {
@@ -58,6 +60,63 @@ export class MonitorService {
     return this.mapToMonitorDto(monitor);
   }
 
+  async getSchedule(userId: string): Promise<ScheduleDto[]> {
+    const monitor = await this.prisma.monitor.findUnique({
+      where: { userId },
+      include: {
+        classes: {
+          include: {
+            schedules: {
+              include: {
+                hourSession: true,
+                teacher: {
+                  include: {
+                    user: {
+                      include: { userProfile: true },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!monitor) {
+      throw new NotFoundException('Monitor no encontrado');
+    }
+
+    if (!Array.isArray(monitor.classes) || monitor.classes.length === 0) {
+      return [];
+    }
+
+    return monitor.classes.reduce((acc, clas) => {
+      if (!clas.schedules || clas.schedules.length === 0) return acc;
+
+      const classSchedules: ScheduleDto[] = clas.schedules.map(schedule => ({
+        id: schedule.id,
+        weekday: schedule.weekday,
+        hourSession: {
+          id: schedule.hourSession.id,
+          period: schedule.hourSession.period,
+          startTime: schedule.hourSession.startTime,
+          endTime: schedule.hourSession.endTime,
+        },
+        teacher: schedule.teacher?.user?.userProfile
+          ? {
+              firstName: schedule.teacher.user.userProfile.firstName,
+              lastName: schedule.teacher.user.userProfile.lastName,
+            }
+          : undefined,
+      }));
+
+      return acc.concat(classSchedules);
+    }, [] as ScheduleDto[]);
+  }
+  
+  
+  
   // ─────── Métodos auxiliares ───────
 
   private mapToMonitorDto(obj: any): MonitorBaseDto {
