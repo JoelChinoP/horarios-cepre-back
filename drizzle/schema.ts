@@ -8,25 +8,27 @@ import {
   primaryKey,
   smallserial,
   integer,
+  boolean,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 // Modelo AdmisionProcess
-export const admisionProcesses = pgTable(
-  'admision_processes',
+export const admissionProcesses = pgTable(
+  'admission_processes',
   {
     id: smallserial('id').primaryKey(),
-    name: varchar('name', { length: 48 }).notNull(),
-    year: varchar('year', { length: 4 }).notNull(),
+    name: varchar('name', { length: 64 }).notNull(),
+    isCurrent: boolean('is_current').default(true).notNull(),
+    year: varchar('db_year', { length: 4 }).notNull(),
     description: varchar('description', { length: 255 }),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
-  (table) => [uniqueIndex('admision_process_name_unique').on(table.name)],
+  (table) => [uniqueIndex('admission_process_name_unique').on(table.name)],
 );
 
 // Relaciones para AdmisionProcess
-export const admisionProcessesRelations = relations(
-  admisionProcesses,
+export const admissionProcessesRelations = relations(
+  admissionProcesses,
   ({ many }) => ({
     observations: many(observations),
   }),
@@ -39,14 +41,14 @@ export const observations = pgTable('observations', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   admissionProcessId: smallserial('admission_process_id')
     .notNull()
-    .references(() => admisionProcesses.id, { onDelete: 'cascade' }),
+    .references(() => admissionProcesses.id, { onDelete: 'cascade' }),
 });
 
 // Relaciones para Observation
 export const observationsRelations = relations(observations, ({ one }) => ({
-  admissionProcess: one(admisionProcesses, {
+  admissionProcess: one(admissionProcesses, {
     fields: [observations.admissionProcessId],
-    references: [admisionProcesses.id],
+    references: [admissionProcesses.id],
   }),
 }));
 

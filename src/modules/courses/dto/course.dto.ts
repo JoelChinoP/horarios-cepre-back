@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsInt, Min } from 'class-validator';
+import { IsString, IsNotEmpty, IsInt, Min, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CourseDto {
@@ -25,6 +25,6 @@ export class CourseDto {
     example: 'Curso de matemáticas avanzadas',
   })
   @IsString()
-  @IsNotEmpty({ message: 'La descripción del curso es obligatoria.' })
-  description: string;
+  @IsOptional()
+  description?: string;
 }

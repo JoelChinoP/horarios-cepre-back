@@ -1,39 +1,49 @@
 import { execSync } from 'child_process';
-//import { SchemaDefaultStore } from '@database/prisma/schema-default.store';
-
+import * as fs from 'fs';
+import * as path from 'path';
 import * as dotenv from 'dotenv';
-import path from 'path';
 
-// Carga las variables del .env
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+dotenv.config();
 
-// Lee la variable DEFAULT_SCHEMA
-const schema = process.env.DEFAULT_SCHEMA;
+const MIGRATIONS_DIR = path.resolve(__dirname, '/migrations');
 
-if (!schema) {
-  throw new Error('❌ DEFAULT_SCHEMA no está definida en .env');
-}
+const isInitialMigration = (): boolean => {
+  try {
+    if (!fs.existsSync(MIGRATIONS_DIR)) {
+      return true;
+    }
 
-// Crea una copia de DATABASE_URL pero con el schema deseado
-//const originalDbUrl = process.env.DATABASE_URL;
-const dbUrlWithSchema = `${process.env.DATABASE_URL}&schema=${schema}`; //originalDbUrl?.replace(
-//  /schema=\w+/,
-//  `schema=${schema}`,
-//);
+    const contents = fs.readdirSync(MIGRATIONS_DIR, { withFileTypes: true });
+    const folders = contents.filter((entry) => entry.isDirectory());
 
-if (!dbUrlWithSchema) {
-  throw new Error('❌ DATABASE_URL no está definida en .env');
-}
+    return folders.length === 0;
+  } catch (error) {
+    console.error('Error al verificar las migraciones existentes:', error);
+    return true; // Por seguridad, tratamos como inicial
+  }
+};
 
-// Prisma usa DATABASE_URL, así que la inyectamos temporalmente
-process.env.DATABASE_URL = dbUrlWithSchema;
+const runMigrations = () => {
+  const schemaName = process.env.DEFAULT_SCHEMA;
+  const dbUrl = `${process.env.DATABASE_URL}&schema=${schemaName}`;
+  process.env.DATABASE_URL = dbUrl;
 
-const commandMigrate = `npx prisma migrate dev --name init-${schema}`;
+  console.log('🧬 Generando Prisma Client...');
+  execSync('npx prisma generate', { stdio: 'inherit' });
+
+  if (isInitialMigration()) {
+    console.log('🚀 Aplicando migración inicial...');
+    execSync('npx prisma migrate dev --name init', { stdio: 'inherit' });
+  } else {
+    console.log('📦 Ejecutando migraciones existentes (deploy)...');
+    execSync('npx prisma migrate deploy', { stdio: 'inherit' });
+  }
+
+  console.log('\n✅ Migración ejecutada correctamente.');
+};
 
 try {
-  console.log(`🛠️  Ejecutando migración en el esquema: ${schema}`);
-  execSync(commandMigrate, { stdio: 'inherit' });
-  console.log('✅ Migración aplicada correctamente.');
-} catch (error) {
-  console.error('❌ Error al ejecutar la migración:', error);
+  runMigrations();
+} catch (err) {
+  console.error('❌ Error al ejecutar la migración:', err);
 }
