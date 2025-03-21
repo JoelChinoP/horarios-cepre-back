@@ -33,7 +33,12 @@ import {
     update(@Param('id') id: string, @Body() updateSupervisorDto: UpdateSupervisorDto) {
       return this.supervisorService.update(id, updateSupervisorDto);
     }
-  
+   /*
+     @Patch(':id/deactivate')
+        async deactivateSupervisor(@Param('id') id: string) {
+          return this.supervisorService.deactivate(id);
+        }
+    */
     @Delete(':id')
     delete(@Param('id') id: string) {
       return this.supervisorService.delete(id);

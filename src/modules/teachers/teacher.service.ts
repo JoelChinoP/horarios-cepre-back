@@ -58,6 +58,19 @@ export class TeacherService {
     return this.mapToTeacherDto(teacher);
   }
 
+  async deactivate(id: string) {
+    const teacher = await this.prisma.teacher.findUnique({ where: { id } });
+
+    if (!teacher) {
+      throw new NotFoundException('User teacher not found');
+    }
+
+    return this.prisma.teacher.update({
+      where: { id },
+      data: { isActive: false },
+    });
+  }
+
   // ─────── Métodos auxiliares ───────
 
   private mapToTeacherDto(obj: any): TeacherBaseDto {

@@ -58,6 +58,21 @@ export class MonitorService {
     return this.mapToMonitorDto(monitor);
   }
 
+    /*
+  async deactivate(id: string) {
+    const monitor = await this.prisma.monitor.findUnique({ where: { id } });
+
+    if (!monitor) {
+      throw new NotFoundException('User monitor not found');
+    }
+
+    return this.prisma.monitor.update({
+      where: { id },
+      data: { isActive: false },
+    });
+  }
+  */
+
   // ─────── Métodos auxiliares ───────
 
   private mapToMonitorDto(obj: any): MonitorBaseDto {

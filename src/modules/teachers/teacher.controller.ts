@@ -6,6 +6,7 @@ import {
   Param,
   Put,
   Delete,
+  Patch,
 } from '@nestjs/common';
 import { TeacherService } from './teacher.service';
 import { CreateTeacherDto, UpdateTeacherDto } from './dto';
@@ -39,6 +40,12 @@ export class TeacherController {
   delete(@Param('id') id: string) {
     return this.teacherService.delete(id);
   }
+
+  @Patch(':id/deactivate')
+    async deactivateTeacher(@Param('id') id: string) {
+      return this.teacherService.deactivate(id);
+    }
+
   /*
   @Get(':teacherId/schedules')
   @ApiOperation({

@@ -58,6 +58,20 @@ export class SupervisorService {
     return this.mapToSupervisorDto(supervisor);
   }
 
+  /*
+  async deactivate(id: string) {
+    const supervisor = await this.prisma.supervisor.findUnique({ where: { id } });
+
+    if (!supervisor) {
+      throw new NotFoundException('User supervisor not found');
+    }
+
+    return this.prisma.supervisor.update({
+      where: { id },
+      data: { isActive: false },
+    });
+  }
+  */
   // ─────── Métodos auxiliares ───────
 
   private mapToSupervisorDto(obj: any): SupervisorBaseDto {

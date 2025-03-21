@@ -38,4 +38,11 @@ import {
     delete(@Param('id') id: string) {
       return this.monitorService.delete(id);
     }
+
+        /*
+    @Patch(':id/deactivate')
+      async deactivateMonitor(@Param('id') id: string) {
+        return this.monitorService.deactivate(id);
+      }
+    */
   }
