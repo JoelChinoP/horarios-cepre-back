@@ -2,9 +2,6 @@ import { IsString, IsOptional, IsBoolean, IsArray, IsEmail } from 'class-validat
 
 export class CreateUserProfileDto {
   @IsString()
-  userId: string;
-
-  @IsString()
   dni: string;
 
   @IsString()
