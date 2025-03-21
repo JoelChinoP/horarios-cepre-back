@@ -1,5 +1,6 @@
 import { PartialType, OmitType } from '@nestjs/swagger';
 import { ScheduleDto } from './schedule.dto';
+import { ScheduleForTeacherDto } from './scheduleForTeacher.dto';
 
 // DTO idéntico al ScheduleDto
 export { ScheduleDto };
@@ -23,3 +24,11 @@ export class CreateScheduleDto extends OmitType(ScheduleDto, [
 export class UpdateScheduleDto extends PartialType(
   OmitType(ScheduleDto, ['id', 'clas', 'hourSession', 'teacher'] as const),
 ) {}
+
+export class ScheduleForClass extends OmitType(ScheduleDto, [
+  'clas',
+  'teacher',
+] as const) {
+  name: string;
+}
+export { ScheduleForTeacherDto };

@@ -1,5 +1,6 @@
 import { OmitType } from '@nestjs/swagger';
 import { HourSessionDto } from './hour-session.dto';
+import { HourSessionForTeacherDto } from './HourSessionForTeacher.dto';
 
 // Exportación de todos los DTOs
 export { HourSessionDto };
@@ -15,3 +16,5 @@ export class CreateHourSessionDto extends HourSessionBaseDto {}
 
 // DTO para actualizar una sesión de hora (con duracion)
 export class UpdateHourSessionDto extends HourSessionBaseDto {}
+
+export { HourSessionForTeacherDto };

@@ -1,9 +1,6 @@
 import { OmitType, PartialType } from '@nestjs/swagger';
 import { ClassDto } from './class.dto';
-import { Expose } from 'class-transformer';
-import { ScheduleDto } from '@modules/schedules/dto';
-import { AreaDto } from '@modules/areas/dto';
-
+import { ClassForTeacherDto } from './classForTeacher.dto';
 // DTO con propiedades comunes
 export { ClassDto };
 
@@ -37,36 +34,4 @@ export class UpdateClassDto extends PartialType(
   ] as const),
 ) {}
 
-export class ClassesForProfesor extends OmitType(ClassDto, [
-  'monitor', // Puedes incluirlo si lo necesitas
-] as const) {
-  @Expose()
-  name: string;
-
-  @Expose()
-  monitor: {
-    user: {
-      id: string;
-      name: string;
-      lastName: string;
-      phone: string | null;
-      supervisor: {
-        user: {
-          id: string;
-          name: string;
-          lastName: string;
-          phone: string | null;
-        };
-      };
-    };
-  };
-
-  @Expose()
-  area: AreaDto;
-
-  @Expose()
-  urlMeet?: string;
-
-  @Expose()
-  schedules: ScheduleDto[];
-}
+export { ClassForTeacherDto };
