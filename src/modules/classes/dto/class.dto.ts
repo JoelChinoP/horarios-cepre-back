@@ -74,5 +74,5 @@ export class ClassDto {
 
   @IsOptional()
   @ApiProperty({ type: [ScheduleDto] })
-  schedules?: ScheduleDto[]; // Agregamos el DTO en lugar de la entidad
+  schedules?: ScheduleDto[];
 }
