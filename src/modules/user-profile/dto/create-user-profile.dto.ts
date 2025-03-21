@@ -8,9 +8,6 @@ import {
 
 export class CreateUserProfileDto {
   @IsString()
-  userId: string;
-
-  @IsString()
   dni: string;
 
   @IsString()

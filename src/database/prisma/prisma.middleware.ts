@@ -19,8 +19,6 @@ export class SchemaMiddleware implements NestMiddleware {
         ? schemaHeader
         : SchemaDefaultStore.getSchema();
 
-    console.log('schema:', schema);
-
     // Validación de esquema
     if (!SchemaDefaultStore.isValidSchema(schema)) {
       this.logger.warn(`Invalid x-schema header: ${schema}`);

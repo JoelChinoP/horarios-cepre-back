@@ -7,8 +7,22 @@ import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 export class UserProfileService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: CreateUserProfileDto) {
-    return this.prisma.userProfile.create({ data });
+  async create(userId: string, createUserProfileDto: CreateUserProfileDto) {
+    // Verificar si el usuario existe antes de crear el perfil
+    const userExists = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!userExists) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    return this.prisma.userProfile.create({
+      data: {
+        userId,
+        ...createUserProfileDto,
+      },
+    });
   }
 
   async findAll() {
@@ -18,8 +32,11 @@ export class UserProfileService {
   }
 
   async findOne(id: string) {
-    const userProfile = await this.prisma.userProfile.findUnique({ where: { id } });
-    if (!userProfile) throw new NotFoundException('Perfil de usuario no encontrado');
+    const userProfile = await this.prisma.userProfile.findUnique({
+      where: { id },
+    });
+    if (!userProfile)
+      throw new NotFoundException('Perfil de usuario no encontrado');
     return userProfile;
   }
 
