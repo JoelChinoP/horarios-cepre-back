@@ -9,7 +9,7 @@ import { JwtStrategy } from '@modules/auth/strategies/jwt.strategy';
 import { PrismaModule } from '../../../prisma/prisma.module';
 import { SyncAuthorizationService } from './sync-authorization.service';
 import { DiscoveryModule } from '@nestjs/core';
-import {PrismaService} from "../../../prisma/prisma.service";
+import { PrismaService } from '../../../prisma/prisma.service';
 
 @Module({
   imports: [

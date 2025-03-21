@@ -114,9 +114,7 @@ export class MonitorService {
       return acc.concat(classSchedules);
     }, [] as ScheduleDto[]);
   }
-  
-  
-  
+
   // ─────── Métodos auxiliares ───────
 
   private mapToMonitorDto(obj: any): MonitorBaseDto {

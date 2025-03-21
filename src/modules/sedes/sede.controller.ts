@@ -13,6 +13,7 @@ import {
 import { SedeService } from './sede.service';
 import { CreateSedeDto, UpdateSedeDto } from './dto/index';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Unauthenticated } from '@modules/auth/decorators/unauthenticated.decorator';
 
 @ApiTags('Sedes')
 @Controller('sedes')
@@ -29,6 +30,7 @@ export class SedeController {
   }
 
   @Get()
+  @Unauthenticated()
   @ApiOperation({ summary: 'Obtiene todas las sedes' })
   @ApiResponse({
     status: 200,
