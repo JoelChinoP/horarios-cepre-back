@@ -57,7 +57,9 @@ export class ClassService {
 
   // Metodo para mapear un objeto de tipo Class a un objeto de tipo ClassDto
   private mapToClassDto(obj: any): ClassBaseDto {
-    return plainToInstance(ClassBaseDto, obj);
+    return plainToInstance(ClassBaseDto, obj, {
+      excludePrefixes: ['sedeId', 'areaId', 'shiftId', 'monitorId'],
+    });
   }
 
   async findAllTest(): Promise<ClassesForProfesor[]> {

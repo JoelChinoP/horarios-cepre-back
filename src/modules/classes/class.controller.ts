@@ -21,6 +21,7 @@ import {
 } from './dto';
 import { PrismaExceptionInterceptor } from '@database/prisma/prisma-exception.interceptor';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Unauthenticated } from '@modules/auth/decorators/unauthenticated.decorator';
 
 @Controller('classes')
 @UseInterceptors(PrismaExceptionInterceptor)
@@ -40,6 +41,7 @@ export class ClassController {
   }
 
   @Get()
+  @Unauthenticated()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Obtener todas las clases',
@@ -90,6 +92,4 @@ export class ClassController {
   deleteArea(@Param('id', ParseUUIDPipe) id: string): Promise<ClassBaseDto> {
     return this.classService.delete(id);
   }
-
-
 }
