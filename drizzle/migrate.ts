@@ -15,22 +15,19 @@ const runMigrations = async () => {
 
   try {
     // Generar migraciones con Drizzle Kit
+    console.log('\nApplying migrations...');
     execSync('npx drizzle-kit generate');
-    console.log('Migraciones generadas exitosamente.');
-
-    // Ejecutar las migraciones con Drizzle Kit
-    execSync('npx drizzle-kit migrate');
-    console.log('Migrations completed successfully.');
+    console.log('Migrations applied successfully.');
 
     // Ejecutar el archivo SQL después de la primera migración
     const sqlFilePath = join(
       __dirname,
-      'stored-procedures/create_process_admission.sql', // Ruta al archivo SQL
+      'stored-procedures/trigger_create_process_admission.sql', // Ruta al archivo SQL
     );
     if (existsSync(sqlFilePath)) {
       const sql = readFileSync(sqlFilePath, 'utf8');
       await client.query(sql);
-      console.log('Stored procedures executed successfully.');
+      console.log('\nStored procedures executed successfully.');
     } else {
       console.error('Error: No se encontró el archivo SQL en', sqlFilePath);
     }

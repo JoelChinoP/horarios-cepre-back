@@ -1,0 +1,1 @@
+ALTER TABLE "admission_processes" ADD COLUMN "is_current" boolean DEFAULT true NOT NULL;

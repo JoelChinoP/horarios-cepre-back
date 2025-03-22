@@ -117,3 +117,12 @@ export const rolesPermissionsRelations = relations(
     }),
   }),
 );
+
+// Export
+export const schema = {
+  admissionProcesses,
+  observations,
+  roles,
+  permissions,
+  rolesPermissions,
+};

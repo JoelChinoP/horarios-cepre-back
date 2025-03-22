@@ -7,9 +7,9 @@ import {
   IsString,
   MaxLength,
 } from 'class-validator';
-import { AdmissionProcessDto } from './admission-process.dto';
+import { AdmissionDto } from './admission.dto';
 
-export class Observation {
+export class ObservationDto {
   @IsNotEmpty()
   @IsNumber()
   id!: number;
@@ -24,7 +24,7 @@ export class Observation {
   admissionProcessId!: number;
 
   @IsOptional()
-  admission: AdmissionProcessDto;
+  admission: AdmissionDto;
 
   @IsDate()
   @Type(() => Date)

@@ -8,8 +8,9 @@ import {
   IsString,
   MaxLength,
 } from 'class-validator';
+import { PermissionDto } from '@modules/permissions/dto';
 
-export class AdmissionProcessDto {
+export class AdmissionDto {
   @IsNotEmpty()
   @IsNumber()
   id!: number;
@@ -20,8 +21,8 @@ export class AdmissionProcessDto {
   name: string;
 
   @IsBoolean()
-  @IsNotEmpty()
-  isCurrent: boolean;
+  @IsOptional()
+  isCurrent?: boolean;
 
   @IsString()
   @IsNotEmpty()
@@ -36,4 +37,7 @@ export class AdmissionProcessDto {
   @IsDate()
   @Type(() => Date)
   createdAt: Date;
+
+  @IsOptional()
+  permissions?: PermissionDto[];
 }

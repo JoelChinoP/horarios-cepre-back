@@ -1,28 +1,28 @@
 import { PartialType, OmitType } from '@nestjs/swagger';
 
-import { Observation } from './observation.dto';
-import { AdmissionProcessDto } from './admission-process.dto';
+import { ObservationDto } from './observation.dto';
+import { AdmissionDto } from './admission.dto';
 
 // DTO identido al modelo de datos
-export { Observation, AdmissionProcessDto };
+export { ObservationDto, AdmissionDto };
 
-export class AdmissionProcessBaseDto extends OmitType(AdmissionProcessDto, [
+export class AdmissionBaseDto extends OmitType(AdmissionDto, [
   'id',
   'description',
   'createdAt',
 ] as const) {}
 
 // DTO para crear una observación (sin id)
-export class CreateObservationDto extends OmitType(Observation, [
+export class CreateObservationDto extends OmitType(ObservationDto, [
   'id',
 ] as const) {}
 
 // DTO para crear un área (sin id)
-export class CreateAdmissionProcessDto extends OmitType(AdmissionProcessDto, [
+export class CreateAdmissionDto extends OmitType(AdmissionDto, [
   'id',
   'createdAt',
 ] as const) {}
 
-export class UpdateAdmissionProcessDto extends PartialType(
-  OmitType(AdmissionProcessDto, ['id', 'createdAt'] as const),
+export class UpdateAdmissionDto extends PartialType(
+  OmitType(AdmissionDto, ['id', 'createdAt'] as const),
 ) {}
