@@ -71,19 +71,19 @@ export class ClassService {
   }
 
   async findClassesOfTeacher(userId: string): Promise<ClassForTeacherDto[]> {
-    // Verificar si el usuario existe antes de crear el perfil
-    const userExists = await this.prisma.user.findUnique({
-      where: { id: userId },
+    const teacher = await this.prisma.teacher.findUnique({
+      where: { userId: userId },
+      select: { id: true },
     });
 
-    if (!userExists) {
+    if (!teacher) {
       throw new NotFoundException('Profesor no encontrado');
     }
     const classs = await this.prisma.class.findMany({
       where: {
         schedules: {
           some: {
-            teacherId: userId,
+            teacherId: teacher.id,
           },
         },
       },
