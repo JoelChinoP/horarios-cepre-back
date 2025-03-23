@@ -75,7 +75,7 @@ export class AdmissionsService {
     return obj;
   }
 
-  // Metodo para obtener todos los procesos de admisión usando cache
+  // Metodo para obtener todos los procesos de admisión usando cache sin current
   async getAllWithCache() {
     const cacheKey = this.config.get<string>(
       'CACHE_KEYS.ALL_ADMISSION',
@@ -92,6 +92,7 @@ export class AdmissionsService {
         isCurrent: true,
         year: true,
       },
+      where: eq(admissionProcesses.isCurrent, false),
     });
 
     // Guardar los datos en cache
