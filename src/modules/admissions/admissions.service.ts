@@ -10,7 +10,12 @@ import { ConfigService } from '@nestjs/config';
 //  initialUsers,
 //} from '@database/prisma/data/seed-data-initial';
 import { admissionProcesses } from '@database/drizzle/schema';
-import { AdmissionBaseDto, AdmissionDto, CreateAdmissionDto } from './dto';
+import {
+  AdmissionBaseDto,
+  AdmissionDto,
+  CreateAdmissionDto,
+  AdmissionCurrentDto,
+} from './dto';
 
 // Add database imports:
 //import { PrismaService } from '@database/prisma/prisma.service';
@@ -52,13 +57,13 @@ export class AdmissionsService {
   }
 
   // Metodo para obtener el proceso de admisión actual
-  async getCurrent() {
+  async getCurrent(): Promise<AdmissionCurrentDto> {
     // Obtener el proceso de admisión actual desde cache
     const currentKey = this.config.get<string>(
       'CACHE_KEYS.CURRENT_ADMISSION',
     ) as string;
     const current = await this.cacheManager.get(currentKey);
-    if (current) return current;
+    if (current) return current as AdmissionCurrentDto;
 
     // Obtener el proceso de admisión actual desde la base de datos
     const obj = await this.drizzle.db.query.admissionProcesses.findFirst({
@@ -69,27 +74,31 @@ export class AdmissionsService {
       where: eq(admissionProcesses.isCurrent, true),
     });
 
+    // Si no hay proceso de admisión actual, retornar el core schema
+    if (!obj) {
+      const coreSchema = this.config.get<string>('CORE_SCHEMA') as string;
+      return { name: coreSchema, year: 0 };
+    }
+
     // Guardar el proceso de admisión actual en cache
-    if (!obj) return null;
     await this.cacheManager.set(currentKey, obj);
     return obj;
   }
 
   // Metodo para obtener todos los procesos de admisión usando cache sin current
-  async getAllWithCache() {
+  async getAllWithCache(): Promise<AdmissionCurrentDto[]> {
     const cacheKey = this.config.get<string>(
       'CACHE_KEYS.ALL_ADMISSION',
     ) as string;
 
     // Obtener la clave de cache
     const cachedData = await this.cacheManager.get(cacheKey);
-    if (cachedData) return cachedData;
+    if (cachedData) return cachedData as AdmissionCurrentDto[];
 
     // Obtener los datos de la base de datos en caso de no estar en cache
     const data = await this.drizzle.db.query.admissionProcesses.findMany({
       columns: {
         name: true,
-        isCurrent: true,
         year: true,
       },
       where: eq(admissionProcesses.isCurrent, false),

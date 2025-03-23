@@ -1,16 +1,17 @@
-import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
+import { PrismaClientFactory } from './prisma-client.factory';
+import { RequestSchemaService } from './request-schema.service';
 
 @Injectable()
-export class PrismaService
-  extends PrismaClient
-  implements OnModuleInit, OnModuleDestroy
-{
-  async onModuleInit() {
-    await this.$connect();
-  }
+export class PrismaService {
+  constructor(
+    private factory: PrismaClientFactory,
+    private request: RequestSchemaService,
+  ) {}
 
-  async onModuleDestroy() {
-    await this.$disconnect();
+  get client(): PrismaClient {
+    const schema = this.request.getSchema();
+    return this.factory.getClient(schema);
   }
 }
