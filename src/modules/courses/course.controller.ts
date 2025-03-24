@@ -13,6 +13,7 @@ import {
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { CourseService } from './course.service';
 import { CreateCourseDto, UpdateCourseDto } from './dto';
+import {Authorization, Role} from "@modules/auth/decorators/authorization.decorator";
 
 @ApiTags('Courses')
 @Controller('courses')
@@ -20,6 +21,11 @@ export class CourseController {
   constructor(private readonly courseService: CourseService) {}
 
   @Post()
+  @Authorization({
+    roles: [Role.TEACHER, Role.SUPERVISOR, Role.MONITOR],
+    permission: 'courses.create',
+    description: 'crear un nuevo curso',
+  })
   @ApiOperation({ summary: 'Crear un nuevo curso' })
   @ApiResponse({ status: 201, description: 'Curso creado exitosamente.' })
   @ApiResponse({ status: 400, description: 'Datos inválidos.' })
@@ -37,6 +43,11 @@ export class CourseController {
   }
 
   @Get()
+  @Authorization({
+    roles: [Role.TEACHER, Role.SUPERVISOR, Role.MONITOR],
+    permission: 'courses.list',
+    description: 'Listar un nuevo curso',
+  })
   @ApiOperation({ summary: 'Obtener todos los cursos' })
   @ApiResponse({
     status: 200,
@@ -47,6 +58,11 @@ export class CourseController {
   }
 
   @Get(':id')
+  @Authorization({
+    roles: [Role.TEACHER, Role.SUPERVISOR, Role.MONITOR],
+    permission: 'courses.searchId',
+    description: 'Obtener un curso por id',
+  })
   @ApiOperation({ summary: 'Obtener un curso por ID' })
   @ApiResponse({ status: 200, description: 'Curso encontrado.' })
   @ApiResponse({ status: 404, description: 'Curso no encontrado.' })
@@ -59,6 +75,11 @@ export class CourseController {
   }
 
   @Put(':id')
+  @Authorization({
+    roles: [Role.TEACHER, Role.SUPERVISOR, Role.MONITOR],
+    permission: 'courses.update',
+    description: 'Actualizar un curso',
+  })
   @ApiOperation({ summary: 'Actualizar un curso' })
   @ApiResponse({ status: 200, description: 'Curso actualizado exitosamente.' })
   @ApiResponse({ status: 404, description: 'Curso no encontrado.' })
@@ -75,6 +96,11 @@ export class CourseController {
   }
 
   @Delete(':id')
+  @Authorization({
+    roles: [Role.TEACHER, Role.SUPERVISOR, Role.MONITOR],
+    permission: 'courses.delete',
+    description: 'Eliminar un curso',
+  })
   @ApiOperation({ summary: 'Eliminar un curso' })
   @ApiResponse({ status: 200, description: 'Curso eliminado exitosamente.' })
   @ApiResponse({ status: 404, description: 'Curso no encontrado.' })

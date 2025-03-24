@@ -10,9 +10,9 @@ import {
 import { plainToInstance } from 'class-transformer';
 import { ScheduleForTeacherDto } from '@modules/schedules/dto';
 import { HourSessionForTeacherDto } from '@modules/hour-session/dto';
-import {AreaDto} from "@modules/areas/dto";
-import {MonitorForTeacherDto} from "@modules/monitors/dto/monitorForTeacher.dto";
-import {UserProfileForTeacherDto} from "@modules/user-profile/dto/user-profile-for-teacher.dto";
+import { AreaDto } from '@modules/areas/dto';
+import { MonitorForTeacherDto } from '@modules/monitors/dto/monitorForTeacher.dto';
+import { UserProfileForTeacherDto } from '@modules/user-profile/dto/user-profile-for-teacher.dto';
 
 @Injectable()
 export class ClassService {
@@ -70,8 +70,23 @@ export class ClassService {
     return plainToInstance(ClassBaseDto, obj);
   }
 
-  async findAllTest(): Promise<ClassForTeacherDto[]> {
+  async findClassesOfTeacher(userId: string): Promise<ClassForTeacherDto[]> {
+    const teacher = await this.prisma.teacher.findUnique({
+      where: { userId: userId },
+      select: { id: true },
+    });
+
+    if (!teacher) {
+      throw new NotFoundException('Profesor no encontrado');
+    }
     const classs = await this.prisma.class.findMany({
+      where: {
+        schedules: {
+          some: {
+            teacherId: teacher.id,
+          },
+        },
+      },
       include: {
         area: true,
         shift: true,
