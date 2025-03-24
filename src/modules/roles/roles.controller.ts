@@ -13,6 +13,7 @@ import {
 import { RolesService } from './roles.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateRoleDto, RoleResponseDto, UpdateRoleDto } from './dto';
+import { Unauthenticated } from '@modules/auth/decorators/unauthenticated.decorator';
 
 @Controller('roles')
 @ApiTags('Roles')
@@ -31,6 +32,7 @@ export class RolesController {
   }
 
   @Get()
+  @Unauthenticated()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Obtener todos los roles',
@@ -63,6 +65,19 @@ export class RolesController {
     return this.rolesService.delete(id);
   }
 
+  // ─────── Ot
+  @Unauthenticated()
+  @Get(':name')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Obtener un rol con sus permisos',
+    description: 'Get a role with its permissions',
+  })
+  getRoleWithPermissions(@Param('name') name: string) {
+    return this.rolesService.getAllPermissionsByRolName(name);
+  }
+
+  @Unauthenticated()
   @Get('permissions')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({

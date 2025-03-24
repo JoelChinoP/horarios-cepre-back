@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { permissions, roles, rolesPermissions } from 'drizzle/schema';
+import { permissions, roles, rolesPermissions } from '@database/drizzle/schema';
 import { and, eq } from 'drizzle-orm';
 import { DrizzleService } from '@database/drizzle/drizzle.service';
 import {
@@ -26,7 +26,7 @@ export class PermissionsService {
 
   // Obtener todos los permisos
   async getAll(): Promise<PermissionResponseDto[]> {
-    const obj = await this.drizzle.db.select().from(permissions);
+    const obj = await this.drizzle.db.query.permissions.findMany();
     return obj.map((item) => this.mapToPermissionDto(item));
   }
 

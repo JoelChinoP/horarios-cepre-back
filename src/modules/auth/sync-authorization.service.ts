@@ -5,9 +5,10 @@ import { InstanceWrapper } from '@nestjs/core/injector/instance-wrapper';
 import {
   AUTHORIZATION_METADATA_KEY,
   AuthorizationMetadata,
+  Role,
 } from './decorators/authorization.decorator';
 import { DrizzleService } from '@database/drizzle/drizzle.service';
-import { permissions, roles, rolesPermissions } from 'drizzle/schema';
+import { permissions, roles, rolesPermissions } from '@database/drizzle/schema';
 //import path from 'path';
 interface EndpointMetadata extends AuthorizationMetadata {
   method: string; // HTTP
@@ -34,11 +35,13 @@ export class SyncAuthorizationService {
   async syncAuthorization() {
     const data = this.getAllEndpointMetadata();
 
+    console.log(data);
+
     // Extraer todos los roles únicos
-    const rolesSet = new Set();
-    data.forEach((data) => {
-      data.roles.forEach((role) => rolesSet.add(role));
-    });
+    const roleRecords = Object.values(Role).map((role) => ({
+      name: role,
+      description: `Rol para ${role}`,
+    }));
 
     return await this.drizzleService.db.transaction(async (tx) => {
       // 1. Eliminar datos existentes - usa una sola consulta si es posible con cascada
@@ -47,11 +50,6 @@ export class SyncAuthorizationService {
       await tx.delete(roles);
 
       // 2. Insertar roles (inserción masiva)
-      const roleRecords = Array.from(rolesSet).map((name) => ({
-        name: name as string,
-        description: `Rol para ${name as string}`,
-      }));
-
       const insertedRoles = await tx
         .insert(roles)
         .values(roleRecords)
@@ -119,6 +117,7 @@ export class SyncAuthorizationService {
   private getAllEndpointMetadata(): EndpointMetadata[] {
     const endpoints: EndpointMetadata[] = [];
     const controllers = this.discoveryService.getControllers();
+    const permissionSet = new Set<string>(); // Usamos un Set para rastrear los permisos únicos
 
     controllers.forEach((wrapper: InstanceWrapper) => {
       const { instance, metatype } = wrapper;
@@ -142,13 +141,23 @@ export class SyncAuthorizationService {
           );
 
           if (decorator) {
-            endpoints.push({
-              roles: decorator.roles,
-              permission: decorator.permission,
-              description: decorator.description,
-              path: this.getFullPath(controllerPath, methodPath),
-              method: this.httpMethods[type],
-            });
+            const { permission } = decorator;
+            const fullPath = this.getFullPath(controllerPath, methodPath);
+
+            // Verificamos si el permiso ya existe
+            if (permissionSet.has(permission)) {
+              throw new Error(`
+                Duplicate permission in ${fullPath} found permission: ${permission}`);
+            } else {
+              permissionSet.add(permission); // Agregamos el permiso al Set
+              endpoints.push({
+                roles: decorator.roles,
+                permission: decorator.permission,
+                description: decorator.description,
+                path: fullPath,
+                method: this.httpMethods[type],
+              });
+            }
           }
         });
     });
@@ -159,17 +168,14 @@ export class SyncAuthorizationService {
   private getFullPath(controllerPath: string, methodPath: string): string {
     const normControllerPath = controllerPath.startsWith('/')
       ? controllerPath
-      : `/${controllerPath}`;
-
+      : `api/${controllerPath}`;
     const normMethodPath = methodPath.startsWith('/')
       ? methodPath
       : `/${methodPath}`;
-
     // Handle empty method path special case
     if (normMethodPath === '/') {
       return normControllerPath;
     }
-
     return `${normControllerPath}${normMethodPath}`;
   }
 }

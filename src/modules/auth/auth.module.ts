@@ -9,11 +9,12 @@ import { JwtStrategy } from '@modules/auth/strategies/jwt.strategy';
 import { PrismaModule } from '../../../prisma/prisma.module';
 import { SyncAuthorizationService } from './sync-authorization.service';
 import { DiscoveryModule } from '@nestjs/core';
-import {PrismaService} from "../../../prisma/prisma.service";
+import { DrizzleModule } from '@database/drizzle/drizzle.module';
 
 @Module({
   imports: [
     PrismaModule,
+    DrizzleModule,
     ConfigModule,
     DiscoveryModule,
     PassportModule.register({ defaultStrategy: 'jwt' }), // 👈 Registra la estrategia 'jwt'
@@ -32,7 +33,6 @@ import {PrismaService} from "../../../prisma/prisma.service";
     JwtStrategy,
     GoogleStrategy,
     SyncAuthorizationService,
-    PrismaService,
   ],
   exports: [AuthService, JwtStrategy],
 })

@@ -7,6 +7,7 @@ import {
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import appConfig from 'src/config/app.config';
 
 // Import Database Modules
 import { DrizzleModule } from '@database/drizzle/drizzle.module';
@@ -15,9 +16,14 @@ import { SchemaMiddleware } from '@database/prisma/prisma.middleware';
 
 // Modules
 import { ModulesModule } from '@modules/modules.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      load: [appConfig],
+      isGlobal: true,
+    }),
     PrismaModule.forRoot({
       isGlobal: true, // para que no necesites importarlo en cada módulo
     }),

@@ -18,16 +18,19 @@ import { AuthorizationGuard } from './auth/guards/authorization.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 
-
 import { UserProfileModule } from './user-profile/user-profile.module';
 import { SupervisorModule } from '@modules/supervisors/supervisor.module';
 import { MonitorModule } from '@modules/monitors/monitor.module';
 import { TeacherModule } from '@modules/teachers/teacher.module';
 
+import { AdmissionsModule } from './admissions/admissions.module';
+
 @Module({
   imports: [
     UsersModule,
     AuthModule,
+    AdmissionsModule,
+
     AreaModule,
     AreaCourseHourModule,
     CourseModule,
@@ -47,6 +50,7 @@ import { TeacherModule } from '@modules/teachers/teacher.module';
   exports: [
     UsersModule,
     AuthModule,
+    AdmissionsModule,
 
     AreaModule,
     AreaCourseHourModule,
@@ -65,11 +69,9 @@ import { TeacherModule } from '@modules/teachers/teacher.module';
     TeacherModule,
   ],
   providers: [
-    JwtService,
-    {
-      provide: APP_GUARD,
-      useClass: AuthorizationGuard,
-    },
+    JwtAuthGuard,
+    AuthorizationGuard,
+    { provide: APP_GUARD, useClass: AuthGlobalGuard },
   ],
 })
 export class ModulesModule {}
