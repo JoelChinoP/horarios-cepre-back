@@ -13,11 +13,23 @@ import { ShiftModule } from './shifts/shift.module';
 import { RolesModule } from './roles/roles.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { CourseModule } from '@modules/courses/course.module';
+// Guard de Autorización
+import { AuthorizationGuard } from './auth/guards/authorization.guard';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtService } from '@nestjs/jwt';
+
+import { UserProfileModule } from './user-profile/user-profile.module';
+import { SupervisorModule } from '@modules/supervisors/supervisor.module';
+import { MonitorModule } from '@modules/monitors/monitor.module';
+import { TeacherModule } from '@modules/teachers/teacher.module';
+
+import { AdmissionsModule } from './admissions/admissions.module';
 
 @Module({
   imports: [
     UsersModule,
     AuthModule,
+    AdmissionsModule,
 
     AreaModule,
     AreaCourseHourModule,
@@ -27,14 +39,19 @@ import { CourseModule } from '@modules/courses/course.module';
     ScheduleModule,
     SedeModule,
     ShiftModule,
-
     RolesModule,
     PermissionsModule,
+    UserProfileModule,
+    SupervisorModule,
+    MonitorModule,
+    TeacherModule,
   ],
 
   exports: [
     UsersModule,
     AuthModule,
+    AdmissionsModule,
+
     AreaModule,
     AreaCourseHourModule,
     CourseModule,
@@ -46,6 +63,17 @@ import { CourseModule } from '@modules/courses/course.module';
 
     RolesModule,
     PermissionsModule,
+
+    SupervisorModule,
+    MonitorModule,
+    TeacherModule,
+  ],
+  providers: [
+    JwtService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthorizationGuard,
+    },
   ],
 })
 export class ModulesModule {}

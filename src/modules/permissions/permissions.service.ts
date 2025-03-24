@@ -1,39 +1,78 @@
 import { Injectable } from '@nestjs/common';
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { Pool } from 'pg';
-import { permissions } from 'drizzle/schema';
-import { eq } from 'drizzle-orm';
+import { permissions, roles, rolesPermissions } from '@database/drizzle/schema';
+import { and, eq } from 'drizzle-orm';
+import { DrizzleService } from '@database/drizzle/drizzle.service';
+import {
+  CreatePermissionDto,
+  PermissionResponseDto,
+  UpdatePermissionDto,
+} from './dto/index';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class PermissionsService {
-  private db;
-
-  constructor() {
-    const pool = new Pool({
-      connectionString: process.env.DATABASE_URL,
-    });
-    this.db = drizzle(pool);
-  }
+  constructor(private drizzle: DrizzleService) {}
 
   // Crear un nuevo permiso
-  async createPermission(name: string, description?: string) {
-    return this.db.insert(permissions).values({ name, description }).returning();
+  async create(
+    createPermissionDto: CreatePermissionDto,
+  ): Promise<PermissionResponseDto> {
+    const obj = await this.drizzle.db
+      .insert(permissions)
+      .values(createPermissionDto)
+      .returning();
+    return this.mapToPermissionDto(obj);
   }
 
   // Obtener todos los permisos
-  async getAllPermissions() {
-    return this.db.select().from(permissions);
+  async getAll(): Promise<PermissionResponseDto[]> {
+    const obj = await this.drizzle.db.query.permissions.findMany();
+    return obj.map((item) => this.mapToPermissionDto(item));
   }
 
-  async updatePermission(id: number, name: string, description?: string) {
-    return this.db
+  // Obtener un permiso por ID
+  async update(
+    id: number,
+    UpdatePermissionDto: UpdatePermissionDto,
+  ): Promise<PermissionResponseDto> {
+    const obj = await this.drizzle.db
       .update(permissions)
-      .set({ name, description })
+      .set(UpdatePermissionDto)
       .where(eq(permissions.id, id))
       .returning();
+
+    return this.mapToPermissionDto(obj);
   }
 
-  async deletePermission(id: number) {
-    return this.db.delete(permissions).where(eq(permissions.id, id)).returning();
+  // Actualizar un permiso
+  async delete(id: number): Promise<PermissionResponseDto> {
+    const obj = await this.drizzle.db
+      .delete(permissions)
+      .where(eq(permissions.id, id))
+      .returning();
+    return this.mapToPermissionDto(obj);
+  }
+
+  // ─────── METODOS DE APOYO ───────
+  private mapToPermissionDto(obj: any): PermissionResponseDto {
+    return plainToInstance(PermissionResponseDto, obj);
+  }
+
+  //*** Considerar mejorarlo con REDIS
+  async checkPermission(
+    roleName: string,
+    permissionName: string,
+  ): Promise<boolean> {
+    const result = await this.drizzle.db
+      .select()
+      .from(rolesPermissions)
+      .innerJoin(roles, eq(rolesPermissions.roleId, roles.id))
+      .innerJoin(permissions, eq(rolesPermissions.permissionId, permissions.id))
+      .where(
+        and(eq(roles.name, roleName), eq(permissions.name, permissionName)),
+      )
+      .limit(1);
+
+    return result.length > 0;
   }
 }
