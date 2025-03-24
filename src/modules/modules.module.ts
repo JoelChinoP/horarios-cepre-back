@@ -69,11 +69,9 @@ import { AdmissionsModule } from './admissions/admissions.module';
     TeacherModule,
   ],
   providers: [
-    JwtService,
-    {
-      provide: APP_GUARD,
-      useClass: AuthorizationGuard,
-    },
+    JwtAuthGuard,
+    AuthorizationGuard,
+    { provide: APP_GUARD, useClass: AuthGlobalGuard },
   ],
 })
 export class ModulesModule {}

@@ -10,37 +10,33 @@ import {
   AuthorizationMetadata,
   Role,
 } from '../decorators/authorization.decorator';
-import { IS_PUBLIC_KEY } from '../decorators/unauthenticated.decorator';
-import { JwtService } from '@nestjs/jwt';
 import { PermissionsService } from '@modules/permissions/permissions.service';
 
 @Injectable()
 export class AuthorizationGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    private jwtService: JwtService,
     private permissionsService: PermissionsService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    // Verificar si la ruta es pública
-    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-    if (isPublic) return true;
-
     // Extraer el token del header de la petición
     const request = context.switchToHttp().getRequest<Request>();
-    const token = this.extractTokenFromHeader(request);
+
+    // ⚠️ Verificamos que `req.user` venga del JwtStrategy (ya validado)
+    const user = request['user'] as { userId: string; role: string };
+    if (!user || !user.role) {
+      throw new UnauthorizedException('User role is missing');
+    }
+    const role = user.role;
+
     const metadata = this.reflector.get<AuthorizationMetadata>(
       AUTHORIZATION_METADATA_KEY,
       context.getHandler(),
     );
-    if (!metadata || !token) throw new UnauthorizedException();
+    if (!metadata) throw new UnauthorizedException();
 
     try {
-      const { role } = this.jwtService.decode<{ role: string }>(token);
       // Verificar si el rol del usuario tiene permisos para acceder a la ruta y está en el enum Role
       const isRoleValid = Object.values(Role).includes(role as Role);
       if (isRoleValid && metadata.roles.includes(role as Role)) return true;
@@ -57,13 +53,5 @@ export class AuthorizationGuard implements CanActivate {
     }
 
     throw new UnauthorizedException();
-  }
-
-  private extractTokenFromHeader(request: Request): string | null {
-    const authHeader = request.headers['authorization'];
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return null;
-    }
-    return authHeader.split(' ')[1];
   }
 }
