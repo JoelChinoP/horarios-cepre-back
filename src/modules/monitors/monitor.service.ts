@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@database/prisma/prisma.service';
 import { CreateMonitorDto, UpdateMonitorDto, MonitorBaseDto, } from './dto';
 import { plainToInstance } from 'class-transformer';
-import { ScheduleDto } from './dto/schedule.dto';
+import { ScheduleDto, Weekday } from './dto/schedule.dto';
 
 
 @Injectable()
@@ -63,16 +63,24 @@ export class MonitorService {
   async getSchedule(userId: string): Promise<ScheduleDto[]> {
     const monitor = await this.prisma.monitor.findUnique({
       where: { userId },
-      include: {
+      select: {
         classes: {
-          include: {
+          select: {
             schedules: {
-              include: {
-                hourSession: true,
+              select: {
+                weekday: true,
+                hourSession: {
+                  select: {
+                    startTime: true,
+                    endTime: true,
+                  },
+                },
                 teacher: {
-                  include: {
-                    user: {
-                      include: { userProfile: true },
+                  select: {
+                    courses: {
+                      select: {
+                        name: true,
+                      },
                     },
                   },
                 },
@@ -82,39 +90,28 @@ export class MonitorService {
         },
       },
     });
-
-    if (!monitor) {
-      throw new NotFoundException('Monitor no encontrado');
+  
+    if (!monitor || !monitor.classes) {
+      throw new NotFoundException('Monitor o clases no encontradas');
     }
-
-    if (!Array.isArray(monitor.classes) || monitor.classes.length === 0) {
-      return [];
-    }
-
-    return monitor.classes.reduce((acc, clas) => {
-      if (!clas.schedules || clas.schedules.length === 0) return acc;
-
-      const classSchedules: ScheduleDto[] = clas.schedules.map(schedule => ({
-        id: schedule.id,
-        weekday: schedule.weekday,
-        hourSession: {
-          id: schedule.hourSession.id,
-          period: schedule.hourSession.period,
-          startTime: schedule.hourSession.startTime,
-          endTime: schedule.hourSession.endTime,
-        },
-        teacher: schedule.teacher?.user?.userProfile
-          ? {
-              firstName: schedule.teacher.user.userProfile.firstName,
-              lastName: schedule.teacher.user.userProfile.lastName,
-            }
-          : undefined,
-      }));
-
-      return acc.concat(classSchedules);
-    }, [] as ScheduleDto[]);
+  
+    // Convertimos el objeto en un array antes de mapear
+    const schedulesArray = Array.isArray(monitor.classes)
+      ? monitor.classes
+      : [monitor.classes];
+  
+    const schedules: ScheduleDto[] = schedulesArray.flatMap(clas =>
+      clas.schedules.map(schedule => ({
+        weekday: schedule.weekday as Weekday,
+        startTime: schedule.hourSession.startTime,
+        endTime: schedule.hourSession.endTime,
+        courseName: schedule.teacher?.courses?.name || 'Sin asignar',
+      }))
+    );
+  
+    return schedules;
   }
-
+  
   // ─────── Métodos auxiliares ───────
 
   private mapToMonitorDto(obj: any): MonitorBaseDto {
