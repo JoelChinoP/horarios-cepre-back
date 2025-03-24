@@ -63,15 +63,25 @@ export class MonitorService {
   async getSchedule(userId: string): Promise<ScheduleDto[]> {
     const monitor = await this.prisma.monitor.findUnique({
       where: { userId },
-      include: {
+      select: {
         classes: {
-          include: {
+          select: {
             schedules: {
-              include: {
-                hourSession: true,
+              select: {
+                weekday: true,
+                hourSession: {
+                  select: {
+                    startTime: true,
+                    endTime: true,
+                  },
+                },
                 teacher: {
-                  include: {
-                    courses: true, // 🔥 Se incluye la relación con Course
+                  select: {
+                    courses: {
+                      select: {
+                        name: true,
+                      },
+                    },
                   },
                 },
               },
@@ -81,30 +91,27 @@ export class MonitorService {
       },
     });
   
-    if (!monitor) {
-      throw new NotFoundException('Monitor no encontrado');
+    if (!monitor || !monitor.classes) {
+      throw new NotFoundException('Monitor o clases no encontradas');
     }
   
-    const classes = Array.isArray(monitor.classes) ? monitor.classes : [monitor.classes];
+    // Convertimos el objeto en un array antes de mapear
+    const schedulesArray = Array.isArray(monitor.classes)
+      ? monitor.classes
+      : [monitor.classes];
   
-    if (classes.length === 0) {
-      return [];
-    }
-  
-    const schedules: ScheduleDto[] = classes.flatMap(clas =>
-      clas.schedules?.map(schedule => ({
+    const schedules: ScheduleDto[] = schedulesArray.flatMap(clas =>
+      clas.schedules.map(schedule => ({
         weekday: schedule.weekday as Weekday,
         startTime: schedule.hourSession.startTime,
         endTime: schedule.hourSession.endTime,
-        courseName: schedule.teacher?.courses?.name || 'Sin asignar', // 🔥 Obtener el nombre del curso
-      })) || []
+        courseName: schedule.teacher?.courses?.name || 'Sin asignar',
+      }))
     );
   
     return schedules;
   }
   
-  
-
   // ─────── Métodos auxiliares ───────
 
   private mapToMonitorDto(obj: any): MonitorBaseDto {
