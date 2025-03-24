@@ -34,7 +34,8 @@ export class MonitorController {
     return this.monitorService.findAll();
   }
 
-  @Get(':id')
+  @Unauthenticated()
+  @Get(':id/')
   findOne(@Param('id') id: string) {
     return this.monitorService.findOne(id);
   }
@@ -48,17 +49,16 @@ export class MonitorController {
   delete(@Param('id') id: string) {
     return this.monitorService.delete(id);
   }
-
   
-  @Get('schedule')
-  @Unauthenticated()
   @Authorization({
     roles: [Role.TEACHER, Role.SUPERVISOR, Role.MONITOR],
     permission: 'monitor.schedule',
     description: 'zzzz',
   })
+  @Get('/cargar/horario')
   getSchedule(@Req() req): Promise<ScheduleDto[]> {
-    const userId = req.user['id']; // Obtenemos el ID del usuario desde el token
+    console.log('Usuario autenticado:', req.user);
+    const userId = req.user?.userId; // Obtenemos el ID del usuario desde el token
     return this.monitorService.getSchedule(userId);
   }
 }

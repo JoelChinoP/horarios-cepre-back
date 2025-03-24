@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@database/prisma/prisma.service';
 import { CreateMonitorDto, UpdateMonitorDto, MonitorBaseDto, } from './dto';
 import { plainToInstance } from 'class-transformer';
-import { ScheduleDto } from './dto/schedule.dto';
+import { ScheduleDto, Weekday } from './dto/schedule.dto';
 
 
 @Injectable()
@@ -71,9 +71,7 @@ export class MonitorService {
                 hourSession: true,
                 teacher: {
                   include: {
-                    user: {
-                      include: { userProfile: true },
-                    },
+                    courses: true, // 🔥 Se incluye la relación con Course
                   },
                 },
               },
@@ -82,38 +80,30 @@ export class MonitorService {
         },
       },
     });
-
+  
     if (!monitor) {
       throw new NotFoundException('Monitor no encontrado');
     }
-
-    if (!Array.isArray(monitor.classes) || monitor.classes.length === 0) {
+  
+    const classes = Array.isArray(monitor.classes) ? monitor.classes : [monitor.classes];
+  
+    if (classes.length === 0) {
       return [];
     }
-
-    return monitor.classes.reduce((acc, clas) => {
-      if (!clas.schedules || clas.schedules.length === 0) return acc;
-
-      const classSchedules: ScheduleDto[] = clas.schedules.map(schedule => ({
-        id: schedule.id,
-        weekday: schedule.weekday,
-        hourSession: {
-          id: schedule.hourSession.id,
-          period: schedule.hourSession.period,
-          startTime: schedule.hourSession.startTime,
-          endTime: schedule.hourSession.endTime,
-        },
-        teacher: schedule.teacher?.user?.userProfile
-          ? {
-              firstName: schedule.teacher.user.userProfile.firstName,
-              lastName: schedule.teacher.user.userProfile.lastName,
-            }
-          : undefined,
-      }));
-
-      return acc.concat(classSchedules);
-    }, [] as ScheduleDto[]);
+  
+    const schedules: ScheduleDto[] = classes.flatMap(clas =>
+      clas.schedules?.map(schedule => ({
+        weekday: schedule.weekday as Weekday,
+        startTime: schedule.hourSession.startTime,
+        endTime: schedule.hourSession.endTime,
+        courseName: schedule.teacher?.courses?.name || 'Sin asignar', // 🔥 Obtener el nombre del curso
+      })) || []
+    );
+  
+    return schedules;
   }
+  
+  
 
   // ─────── Métodos auxiliares ───────
 
