@@ -17,6 +17,7 @@ export class AreaService {
 
   async findAll(): Promise<AreaBaseDto[]> {
     const objs = await this.prisma.area.findMany();
+    console.log(objs);
     return objs.map((obj) => this.mapToAreaDto(obj));
   }
 

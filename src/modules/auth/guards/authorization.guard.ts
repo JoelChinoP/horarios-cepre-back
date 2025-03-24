@@ -13,6 +13,7 @@ import {
 import { IS_PUBLIC_KEY } from '../decorators/unauthenticated.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { PermissionsService } from '@modules/permissions/permissions.service';
+import { Request } from 'express';
 
 @Injectable()
 export class AuthorizationGuard implements CanActivate {
@@ -20,7 +21,7 @@ export class AuthorizationGuard implements CanActivate {
     private reflector: Reflector,
     private jwtService: JwtService,
     private permissionsService: PermissionsService,
-  ) {}
+  ) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     // Verificar si la ruta es pública
@@ -59,11 +60,18 @@ export class AuthorizationGuard implements CanActivate {
     throw new UnauthorizedException();
   }
 
-  private extractTokenFromHeader(request: Request): string | null {
+  private extractTokenFromHeader(
+    request: Request & { cookies?: any },
+  ): string | null {
     const authHeader = request.headers['authorization'];
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return null;
+    if (authHeader?.startsWith('Bearer ')) {
+      return authHeader.split(' ')[1];
     }
-    return authHeader.split(' ')[1];
+
+    if (request.cookies?.jwt) {
+      return request.cookies.jwt;
+    }
+
+    return null;
   }
 }
