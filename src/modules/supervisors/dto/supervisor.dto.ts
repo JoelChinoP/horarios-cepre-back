@@ -21,7 +21,7 @@ export class SupervisorDto {
   userId!: string;
 
   @IsOptional()
-  user: User; //CAMBIAR POR DTO A FUTURO 
+  user: User; //CAMBIAR POR DTO A FUTURO
 
   @ApiProperty({
     description: 'Fecha de creación del supervisor',
