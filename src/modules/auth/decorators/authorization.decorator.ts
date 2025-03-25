@@ -3,7 +3,7 @@ import { SetMetadata } from '@nestjs/common';
 export const AUTHORIZATION_METADATA_KEY = 'authorization';
 
 export interface AuthorizationMetadata {
-  roles: Role[]; // administrador, monitor, supervisor, profesor
+  roles?: Role[]; // administrador, monitor, supervisor, profesor
   permission: string;
   description?: string;
 }
@@ -16,7 +16,7 @@ export enum Role {
 }
 
 export const Authorization = ({
-  roles,
+  roles = [],
   permission,
   description,
 }: AuthorizationMetadata) => {

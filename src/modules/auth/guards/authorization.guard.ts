@@ -39,7 +39,7 @@ export class AuthorizationGuard implements CanActivate {
     try {
       // Verificar si el rol del usuario tiene permisos para acceder a la ruta y está en el enum Role
       const isRoleValid = Object.values(Role).includes(role as Role);
-      if (isRoleValid && metadata.roles.includes(role as Role)) return true;
+      if (isRoleValid && metadata.roles?.includes(role as Role)) return true;
 
       // Verificar si el rol del usuario tiene permisos y está en la base de datos
       const hasPermission = await this.permissionsService.checkPermission(

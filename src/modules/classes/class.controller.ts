@@ -24,10 +24,7 @@ import {
 } from './dto';
 import { PrismaExceptionInterceptor } from '@database/prisma/prisma-exception.interceptor';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import {
-  Authorization,
-  Role,
-} from '@modules/auth/decorators/authorization.decorator';
+import { Authorization } from '@modules/auth/decorators/authorization.decorator';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt-auth.guard';
 
 @Controller('classes')
@@ -38,13 +35,12 @@ export class ClassController {
   constructor(private readonly classService: ClassService) {}
 
   // ─────── CRUD ───────
-  @Authorization({
-    description: 'GAA',
-    permission: 'userProfile.create',
-    roles: [Role.ADMIN],
-  })
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @Authorization({
+    permission: 'class.create',
+    description: 'Crear una nueva clase',
+  })
   @ApiOperation({
     summary: 'Crear una nueva clase',
     description: 'Create a new class',
@@ -53,13 +49,12 @@ export class ClassController {
     return this.classService.create(createClassDto);
   }
 
-  @Authorization({
-    description: 'GAA',
-    permission: 'userProfile.create',
-    roles: [Role.ADMIN],
-  })
   @Get()
   @HttpCode(HttpStatus.OK)
+  @Authorization({
+    permission: 'class.list',
+    description: 'Obtener todas las clases',
+  })
   @ApiOperation({
     summary: 'Obtener todas las clases',
     description: 'Get all classes',
@@ -68,13 +63,12 @@ export class ClassController {
     return this.classService.findAll();
   }
 
-  @Authorization({
-    description: 'Devuelve la clase del profesor',
-    permission: 'userProfile.create',
-    roles: [Role.ADMIN],
-  })
   @Get('getClassOfTeacher')
   @HttpCode(HttpStatus.OK)
+  @Authorization({
+    permission: 'class.listByTeacher',
+    description: 'Obtener todas las clases del docente',
+  })
   @ApiOperation({
     summary: 'Obtener la clase del profito',
     description: 'Get all classes',
@@ -91,6 +85,10 @@ export class ClassController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
+  @Authorization({
+    permission: 'class.getById',
+    description: 'Obtener una clase por id',
+  })
   @ApiOperation({
     summary: 'Obtener una clase por id',
     description: 'Get a class by id',
@@ -101,6 +99,10 @@ export class ClassController {
 
   @Put(':id')
   @HttpCode(HttpStatus.OK)
+  @Authorization({
+    permission: 'class.updateById',
+    description: 'Actualizar una clase por id',
+  })
   @ApiOperation({
     summary: 'Actualizar una clase por id',
     description: 'Update a class by id',
@@ -114,6 +116,10 @@ export class ClassController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @Authorization({
+    permission: 'class.deleteById',
+    description: 'Eliminar una clase por id',
+  })
   @ApiOperation({
     summary: 'Eliminar una clase por id',
     description: 'Delete a class by id',

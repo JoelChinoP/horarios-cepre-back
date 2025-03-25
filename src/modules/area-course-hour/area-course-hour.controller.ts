@@ -19,6 +19,7 @@ import {
 } from './dto';
 import { PrismaExceptionInterceptor } from '@database/prisma/prisma-exception.interceptor';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Authorization } from '@modules/auth/decorators/authorization.decorator';
 
 @Controller('area-course-hours')
 @UseInterceptors(PrismaExceptionInterceptor)
@@ -29,6 +30,10 @@ export class AreaCourseHourController {
   // ─────── CRUD ───────
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @Authorization({
+    permission: 'area-course-hour.create',
+    description: 'Crear una nueva hora de curso-area',
+  })
   @ApiOperation({
     summary: 'Crear una nueva hora de curso-area',
     description: 'Create a new area course hour',
@@ -41,6 +46,10 @@ export class AreaCourseHourController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
+  @Authorization({
+    permission: 'area-course-hour.list',
+    description: 'Obtener todas las horas de curso-area',
+  })
   @ApiOperation({
     summary: 'Obtener todas las horas de curso-area',
     description: 'Get all areas course hours',
@@ -51,6 +60,10 @@ export class AreaCourseHourController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
+  @Authorization({
+    permission: 'area-course-hour.getById',
+    description: 'Obtener una hora de curso-area por id',
+  })
   @ApiOperation({
     summary: 'Obtener una hora de curso-area por id',
     description: 'Get an area course hour by id',
@@ -63,6 +76,10 @@ export class AreaCourseHourController {
 
   @Put(':id')
   @HttpCode(HttpStatus.OK)
+  @Authorization({
+    permission: 'area-course-hour.update',
+    description: 'Actualizar una hora de curso-area por id',
+  })
   @ApiOperation({
     summary: 'Actualizar una hora de curso-area por id',
     description: 'Update an area course hour by id',
@@ -76,6 +93,10 @@ export class AreaCourseHourController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @Authorization({
+    permission: 'area-course-hour.delete',
+    description: 'Eliminar una hora de curso-area por id',
+  })
   @ApiOperation({
     summary: 'Eliminar una hora de curso-area por id',
     description: 'Delete an area course hour by id',

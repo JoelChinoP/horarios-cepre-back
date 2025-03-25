@@ -92,7 +92,7 @@ export class SyncAuthorizationService {
         const permId = permissionIdMap[endpoint.permission];
         if (!permId) continue;
 
-        for (const roleName of endpoint.roles) {
+        for (const roleName of endpoint.roles ?? []) {
           const roleId = roleIdMap[roleName];
           if (roleId) {
             relationRecords.push({ roleId: roleId, permissionId: permId });

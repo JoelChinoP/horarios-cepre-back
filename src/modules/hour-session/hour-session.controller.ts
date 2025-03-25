@@ -13,7 +13,7 @@ import {
 import { HourSessionService } from './hour-session.service';
 import { CreateHourSessionDto, UpdateHourSessionDto } from './dto/index';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import {Authorization, Role} from "@modules/auth/decorators/authorization.decorator";
+import { Authorization } from '@modules/auth/decorators/authorization.decorator';
 
 @ApiTags('Hour Sessions')
 @Controller('hour-sessions')
@@ -22,7 +22,6 @@ export class HourSessionController {
 
   @Post()
   @Authorization({
-    roles: [Role.TEACHER, Role.SUPERVISOR, Role.MONITOR],
     permission: 'hour-session.create',
     description: 'Crear una nueva sesión de hora',
   })
@@ -36,7 +35,6 @@ export class HourSessionController {
 
   @Get()
   @Authorization({
-    roles: [Role.TEACHER, Role.SUPERVISOR, Role.MONITOR],
     permission: 'hour-session.list',
     description: 'Listar las horas de sesión',
   })
@@ -51,7 +49,6 @@ export class HourSessionController {
 
   @Get(':id')
   @Authorization({
-    roles: [Role.TEACHER, Role.SUPERVISOR, Role.MONITOR],
     permission: 'hour-session.searchId',
     description: 'Buscar una hora de sesión',
   })
@@ -64,7 +61,6 @@ export class HourSessionController {
 
   @Put(':id')
   @Authorization({
-    roles: [Role.TEACHER, Role.SUPERVISOR, Role.MONITOR],
     permission: 'hour-session.update',
     description: 'Actualizar una sesión de hora',
   })
@@ -81,7 +77,6 @@ export class HourSessionController {
 
   @Delete(':id')
   @Authorization({
-    roles: [Role.TEACHER, Role.SUPERVISOR, Role.MONITOR],
     permission: 'hour-session.delete',
     description: 'Eliminar una sesión de hora',
   })

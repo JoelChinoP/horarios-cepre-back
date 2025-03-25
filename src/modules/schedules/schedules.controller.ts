@@ -15,6 +15,7 @@ import { ScheduleService } from './schedules.service';
 import { ScheduleBaseDto, CreateScheduleDto, UpdateScheduleDto } from './dto';
 import { PrismaExceptionInterceptor } from '@database/prisma/prisma-exception.interceptor';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Authorization } from '@modules/auth/decorators/authorization.decorator';
 
 @Controller('schedules')
 @UseInterceptors(PrismaExceptionInterceptor)
@@ -25,6 +26,10 @@ export class ScheduleController {
   // ─────── CRUD ───────
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @Authorization({
+    permission: 'schedule.create',
+    description: 'Crear un nuevo horario',
+  })
   @ApiOperation({
     summary: 'Crear un nuevo horario',
     description: 'Create a new schedule',
@@ -37,6 +42,10 @@ export class ScheduleController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
+  @Authorization({
+    permission: 'schedule.list',
+    description: 'Listar todos los horarios',
+  })
   @ApiOperation({
     summary: 'Obtener todos los horarios',
     description: 'Get all schedules',
@@ -47,6 +56,10 @@ export class ScheduleController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
+  @Authorization({
+    permission: 'schedule.getById',
+    description: 'Obtener un horario por id',
+  })
   @ApiOperation({
     summary: 'Obtener un horario por id',
     description: 'Get a schedule by id',
@@ -57,6 +70,10 @@ export class ScheduleController {
 
   @Put(':id')
   @HttpCode(HttpStatus.OK)
+  @Authorization({
+    permission: 'schedule.update',
+    description: 'Actualizar un horario por id',
+  })
   @ApiOperation({
     summary: 'Actualizar un horario por id',
     description: 'Update a schedule by id',
@@ -70,6 +87,10 @@ export class ScheduleController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @Authorization({
+    permission: 'schedule.delete',
+    description: 'Eliminar un horario por id',
+  })
   @ApiOperation({
     summary: 'Eliminar un horario por id',
     description: 'Delete a schedule by id',

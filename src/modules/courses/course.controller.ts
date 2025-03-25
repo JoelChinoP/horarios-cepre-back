@@ -13,7 +13,7 @@ import {
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { CourseService } from './course.service';
 import { CreateCourseDto, UpdateCourseDto } from './dto';
-import {Authorization, Role} from "@modules/auth/decorators/authorization.decorator";
+import { Authorization } from '@modules/auth/decorators/authorization.decorator';
 
 @ApiTags('Courses')
 @Controller('courses')
@@ -22,7 +22,6 @@ export class CourseController {
 
   @Post()
   @Authorization({
-    roles: [Role.TEACHER, Role.SUPERVISOR, Role.MONITOR],
     permission: 'courses.create',
     description: 'crear un nuevo curso',
   })
@@ -44,7 +43,6 @@ export class CourseController {
 
   @Get()
   @Authorization({
-    roles: [Role.TEACHER, Role.SUPERVISOR, Role.MONITOR],
     permission: 'courses.list',
     description: 'Listar un nuevo curso',
   })
@@ -59,7 +57,6 @@ export class CourseController {
 
   @Get(':id')
   @Authorization({
-    roles: [Role.TEACHER, Role.SUPERVISOR, Role.MONITOR],
     permission: 'courses.searchId',
     description: 'Obtener un curso por id',
   })
@@ -76,7 +73,6 @@ export class CourseController {
 
   @Put(':id')
   @Authorization({
-    roles: [Role.TEACHER, Role.SUPERVISOR, Role.MONITOR],
     permission: 'courses.update',
     description: 'Actualizar un curso',
   })
@@ -97,7 +93,6 @@ export class CourseController {
 
   @Delete(':id')
   @Authorization({
-    roles: [Role.TEACHER, Role.SUPERVISOR, Role.MONITOR],
     permission: 'courses.delete',
     description: 'Eliminar un curso',
   })

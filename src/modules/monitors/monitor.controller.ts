@@ -12,11 +12,7 @@ import {
 import { MonitorService } from './monitor.service';
 import { CreateMonitorDto, UpdateMonitorDto } from './dto';
 import { ScheduleDto } from './dto/schedule.dto';
-import {
-  Authorization,
-  Role,
-} from '@modules/auth/decorators/authorization.decorator';
-import { Unauthenticated } from '@modules/auth/decorators/unauthenticated.decorator';
+import { Authorization } from '@modules/auth/decorators/authorization.decorator';
 import { PrismaExceptionInterceptor } from '@database/prisma/prisma-exception.interceptor';
 
 @Controller('monitors')
@@ -25,37 +21,55 @@ export class MonitorController {
   constructor(private readonly monitorService: MonitorService) {}
 
   @Post()
+  @Authorization({
+    permission: 'monitor.create',
+    description: 'Crear un nuevo monitor',
+  })
   create(@Body() createMonitorDto: CreateMonitorDto) {
     return this.monitorService.create(createMonitorDto);
   }
 
   @Get()
+  @Authorization({
+    permission: 'monitor.list',
+    description: 'Listar todos los monitores',
+  })
   findAll() {
     return this.monitorService.findAll();
   }
 
-  @Unauthenticated()
   @Get(':id/')
+  @Authorization({
+    permission: 'monitor.getById',
+    description: 'Obtener un monitor por ID',
+  })
   findOne(@Param('id') id: string) {
     return this.monitorService.findOne(id);
   }
 
   @Put(':id')
+  @Authorization({
+    permission: 'monitor.update',
+    description: 'Actualizar un monitor',
+  })
   update(@Param('id') id: string, @Body() updateMonitorDto: UpdateMonitorDto) {
     return this.monitorService.update(id, updateMonitorDto);
   }
 
   @Delete(':id')
+  @Authorization({
+    permission: 'monitor.delete',
+    description: 'Eliminar un monitor',
+  })
   delete(@Param('id') id: string) {
     return this.monitorService.delete(id);
   }
-  
-  @Authorization({
-    roles: [Role.TEACHER, Role.SUPERVISOR, Role.MONITOR],
-    permission: 'monitor.schedule',
-    description: 'zzzz',
-  })
+
   @Get('/cargar/horario')
+  @Authorization({
+    permission: 'monitor.loadSchedule',
+    description: 'Cargar el horario de un monitor',
+  })
   getSchedule(@Req() req): Promise<ScheduleDto[]> {
     console.log('Usuario autenticado:', req.user);
     const userId = req.user?.userId; // Obtenemos el ID del usuario desde el token

@@ -13,10 +13,7 @@ import {
 import { ShiftService } from './shift.service';
 import { CreateShiftDto, UpdateShiftDto } from './dto/index';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import {
-  Authorization,
-  Role,
-} from '@modules/auth/decorators/authorization.decorator';
+import { Authorization } from '@modules/auth/decorators/authorization.decorator';
 
 @ApiTags('Shifts') // Grupo en Swagger
 @Controller('shifts')
@@ -26,7 +23,6 @@ export class ShiftController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @Authorization({
-    roles: [Role.ADMIN],
     permission: 'shift.create',
     description: 'Crear un nuevo turno',
   })
@@ -37,7 +33,6 @@ export class ShiftController {
 
   @Get()
   @Authorization({
-    roles: [Role.TEACHER, Role.SUPERVISOR, Role.MONITOR],
     permission: 'shift.getAll',
     description: 'Obtener todos los turnos',
   })
@@ -48,7 +43,6 @@ export class ShiftController {
   }
 
   @Authorization({
-    roles: [Role.TEACHER, Role.SUPERVISOR, Role.MONITOR],
     permission: 'shift.searchId',
     description: 'Busca un turno por id',
   })
@@ -60,7 +54,6 @@ export class ShiftController {
 
   @Put(':id')
   @Authorization({
-    roles: [Role.ADMIN],
     permission: 'shift.update',
     description: 'Editar un turno',
   })
@@ -74,7 +67,6 @@ export class ShiftController {
 
   @Delete(':id')
   @Authorization({
-    roles: [Role.ADMIN],
     permission: 'shift.delete',
     description: 'Eliminar un turno',
   })

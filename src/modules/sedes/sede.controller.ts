@@ -13,10 +13,7 @@ import {
 import { SedeService } from './sede.service';
 import { CreateSedeDto, UpdateSedeDto } from './dto/index';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import {
-  Authorization,
-  Role,
-} from '@modules/auth/decorators/authorization.decorator';
+import { Authorization } from '@modules/auth/decorators/authorization.decorator';
 
 @ApiTags('Sedes')
 @Controller('sedes')
@@ -29,7 +26,6 @@ export class SedeController {
   @ApiResponse({ status: 201, description: 'Sede creada correctamente' })
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
   @Authorization({
-    roles: [Role.ADMIN],
     permission: 'sede.create',
     description: 'Crear un nueva sede',
   })
@@ -39,7 +35,6 @@ export class SedeController {
 
   @Get()
   @Authorization({
-    roles: [Role.ADMIN],
     permission: 'sede.list',
     description: 'Lista de la sedes',
   })
@@ -54,7 +49,6 @@ export class SedeController {
 
   @Get(':id')
   @Authorization({
-    roles: [Role.ADMIN],
     permission: 'sede.searchId',
     description: 'Busca sede por id',
   })
@@ -67,7 +61,6 @@ export class SedeController {
 
   @Put(':id')
   @Authorization({
-    roles: [Role.ADMIN],
     permission: 'sede.update',
     description: 'Edita una sede',
   })
@@ -84,7 +77,6 @@ export class SedeController {
 
   @Delete(':id')
   @Authorization({
-    roles: [Role.ADMIN],
     permission: 'sede.delete',
     description: 'Eliminar una sede',
   })
