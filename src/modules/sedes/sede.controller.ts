@@ -13,8 +13,10 @@ import {
 import { SedeService } from './sede.service';
 import { CreateSedeDto, UpdateSedeDto } from './dto/index';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import {Authorization, Role} from "@modules/auth/decorators/authorization.decorator";
-import { Unauthenticated } from '@modules/auth/decorators/unauthenticated.decorator';
+import {
+  Authorization,
+  Role,
+} from '@modules/auth/decorators/authorization.decorator';
 
 @ApiTags('Sedes')
 @Controller('sedes')

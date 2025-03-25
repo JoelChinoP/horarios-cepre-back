@@ -16,7 +16,6 @@ import { CourseModule } from '@modules/courses/course.module';
 // Guard de Autorización
 import { AuthorizationGuard } from './auth/guards/authorization.guard';
 import { APP_GUARD } from '@nestjs/core';
-import { JwtService } from '@nestjs/jwt';
 
 import { UserProfileModule } from './user-profile/user-profile.module';
 import { SupervisorModule } from '@modules/supervisors/supervisor.module';
@@ -24,6 +23,8 @@ import { MonitorModule } from '@modules/monitors/monitor.module';
 import { TeacherModule } from '@modules/teachers/teacher.module';
 
 import { AdmissionsModule } from './admissions/admissions.module';
+import { AuthGlobalGuard } from './auth/guards/auth-global.guard';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 
 @Module({
   imports: [
