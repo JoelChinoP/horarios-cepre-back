@@ -1,9 +1,13 @@
 import { PartialType, OmitType } from '@nestjs/swagger';
 import { ScheduleDto } from './schedule.dto';
 import { ScheduleForTeacherDto } from './scheduleForTeacher.dto';
+import { ScheduleWeekDto } from './schedule-week.dto';
+
+// DTO para cargar horario
+export class LoadScheduleDto extends ScheduleWeekDto {}
 
 // DTO idéntico al ScheduleDto
-export { ScheduleDto };
+export { ScheduleDto, ScheduleWeekDto };
 
 // DTO base con propiedades comunes
 export class ScheduleBaseDto extends OmitType(ScheduleDto, [

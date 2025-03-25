@@ -1,4 +1,4 @@
-import {  OmitType } from '@nestjs/swagger';
+import { OmitType } from '@nestjs/swagger';
 import { ShiftDto } from './shift.dto';
 
 // Exportar el DTO principal

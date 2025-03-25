@@ -31,12 +31,4 @@ export class ShiftDto {
   })
   @IsNotEmpty({ message: 'endTime es obligatorio.' })
   endTime: string;
-
-  @ApiProperty({
-    description: 'ID de la sede a la que pertenece el turno',
-    example: 1,
-  })
-  @IsInt({ message: 'El idSede debe ser un número entero.' })
-  @Min(1, { message: 'El idSede debe ser un número positivo.' })
-  idSede: number;
 }

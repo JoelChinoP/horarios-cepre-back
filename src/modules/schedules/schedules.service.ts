@@ -2,10 +2,15 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@database/prisma/prisma.service';
 import { ScheduleBaseDto, CreateScheduleDto, UpdateScheduleDto } from './dto';
 import { plainToInstance } from 'class-transformer';
+import { LoadScheduleDto } from './dto';
 
 @Injectable()
 export class ScheduleService {
   constructor(private prisma: PrismaService) {}
+
+  loadWithCourses(data: LoadScheduleDto) {
+    console.log(data);
+  }
 
   // ─────── CRUD ───────
   async create(createScheduleDto: CreateScheduleDto): Promise<ScheduleBaseDto> {

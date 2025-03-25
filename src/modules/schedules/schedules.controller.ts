@@ -15,12 +15,23 @@ import { ScheduleService } from './schedules.service';
 import { ScheduleBaseDto, CreateScheduleDto, UpdateScheduleDto } from './dto';
 import { PrismaExceptionInterceptor } from '@database/prisma/prisma-exception.interceptor';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { LoadScheduleDto } from './dto';
 
 @Controller('schedules')
 @UseInterceptors(PrismaExceptionInterceptor)
 @ApiTags('Schedules')
 export class ScheduleController {
   constructor(private readonly scheduleService: ScheduleService) {}
+
+  @Post('load-with-courses')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: 'Cargar horarios con cursos',
+    description: 'Load schedules with courses',
+  })
+  loadWithCourses(data: LoadScheduleDto) {
+    return this.scheduleService.loadWithCourses(data);
+  }
 
   // ─────── CRUD ───────
   @Post()

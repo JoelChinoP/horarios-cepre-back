@@ -17,7 +17,9 @@ import {
   Authorization,
   Role,
 } from '@modules/auth/decorators/authorization.decorator';
+import { Unauthenticated } from '@modules/auth/decorators/unauthenticated.decorator';
 
+@Unauthenticated()
 @ApiTags('Shifts') // Grupo en Swagger
 @Controller('shifts')
 export class ShiftController {
