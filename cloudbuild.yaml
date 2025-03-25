@@ -7,7 +7,7 @@ steps:
   - name: "gcr.io/cloud-builders/docker"
     args: [
       "build",
-      "-t", "southamerica-west1-docker.pkg.dev/$PROJECT_ID/horario-ceprunsa-repo/horario-ceprunsa:$SHORT_SHA",
+      "-t", "southamerica-west1-docker.pkg.dev/$PROJECT_ID/horario-ceprunsa-repo/horario-ceprunsa:latest",
       "."
     ]
 
@@ -15,7 +15,7 @@ steps:
   - name: "gcr.io/cloud-builders/docker"
     args: [
       "push",
-      "southamerica-west1-docker.pkg.dev/$PROJECT_ID/horario-ceprunsa-repo/horario-ceprunsa:$SHORT_SHA"
+      "southamerica-west1-docker.pkg.dev/$PROJECT_ID/horario-ceprunsa-repo/horario-ceprunsa:latest"
     ]
 
   # 4. Desplegar en Cloud Run
@@ -25,11 +25,11 @@ steps:
       - "run"
       - "deploy"
       - "horario-ceprunsa"
-      - "--image=southamerica-west1-docker.pkg.dev/$PROJECT_ID/horario-ceprunsa-repo/horario-ceprunsa:$SHORT_SHA"
+      - "--image=southamerica-west1-docker.pkg.dev/$PROJECT_ID/horario-ceprunsa-repo/horario-ceprunsa:latest"
       - "--platform=managed"
       - "--region=southamerica-west1"
       - "--allow-unauthenticated"
 
 images:
-  - "southamerica-west1-docker.pkg.dev/$PROJECT_ID/horario-ceprunsa-repo/horario-ceprunsa:$SHORT_SHA"
+  - "southamerica-west1-docker.pkg.dev/$PROJECT_ID/horario-ceprunsa-repo/horario-ceprunsa:latest"
 
