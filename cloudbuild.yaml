@@ -1,0 +1,34 @@
+steps:
+  # 1. Autenticarse en Artifact Registry
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["login", "-u", "oauth2accesstoken", "-p", "$ACCESS_TOKEN", "us-central1-docker.pkg.dev"]
+
+  # 2. Construir la imagen de Docker
+  - name: "gcr.io/cloud-builders/docker"
+    args: [
+      "build",
+      "-t", "us-central1-docker.pkg.dev/$PROJECT_ID/horario-ceprunsa-repo/horario-ceprunsa:$SHORT_SHA",
+      "."
+    ]
+
+  # 3. Subir la imagen a Artifact Registry
+  - name: "gcr.io/cloud-builders/docker"
+    args: [
+      "push",
+      "us-central1-docker.pkg.dev/$PROJECT_ID/horario-ceprunsa-repo/horario-ceprunsa:$SHORT_SHA"
+    ]
+
+  # 4. Desplegar en Cloud Run
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: "gcloud"
+    args:
+      - "run"
+      - "deploy"
+      - "horario-ceprunsa"
+      - "--image=us-central1-docker.pkg.dev/$PROJECT_ID/horario-ceprunsa-repo/horario-ceprunsa:$SHORT_SHA"
+      - "--platform=managed"
+      - "--region=us-central1"
+      - "--allow-unauthenticated"
+
+images:
+  - "us-central1-docker.pkg.dev/$PROJECT_ID/horario-ceprunsa-repo/horario-ceprunsa:$SHORT_SHA"
