@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import {Controller, Get, Post, Req, Res, UseGuards} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { SyncAuthorizationService } from './sync-authorization.service';
 import { Unauthenticated } from './decorators/unauthenticated.decorator';
@@ -18,12 +18,10 @@ export class AuthController {
   @Unauthenticated() // Evita que se aplique el guard de autorización
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))
-  googleAuthRedirect(@Req() req, @Req() res) {
-    
-    res.redirect(process.env.REDIRECT_FRONT+'login?token=' + req.user.token);
+  googleAuthRedirect(@Req() req, @Res() res) {
+    res.redirect(process.env.REDIRECT_FRONT + '/login?token=' + req.user.token);
   }
-  
-  
+
   @Post('sync-authorizations')
   syncAuthorizations(): any {
     return this.syncAuthorizationService.syncAuthorization();
