@@ -18,10 +18,12 @@ export class AuthController {
   @Unauthenticated() // Evita que se aplique el guard de autorización
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))
-  googleAuthRedirect(@Req() req) {
-    return req.user;
+  googleAuthRedirect(@Req() req, @Req() res) {
+    
+    res.redirect(process.env.REDIRECT_FRONT+'login?token=' + req.user.token);
   }
-
+  
+  
   @Post('sync-authorizations')
   syncAuthorizations(): any {
     return this.syncAuthorizationService.syncAuthorization();
