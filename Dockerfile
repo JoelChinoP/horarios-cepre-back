@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 8080
 
 # Run application from the root
-CMD ["node", "dist/main.js"]
+CMD ["node", "dist/src/main.js"]
