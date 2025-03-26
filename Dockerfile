@@ -1,20 +1,20 @@
-# Usa Node.js 18 como imagen base
+# Usa Node.js 22 como imagen base
 FROM node:22
 
 # Define el directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-# Copia los archivos del proyecto
-COPY package.json yarn.lock ./
+# Copia los archivos necesarios antes de instalar dependencias
+COPY package.json package-lock.json ./
 
-# Instala dependencias sin guardar en cache
-RUN yarn install --frozen-lockfile
+# Instala dependencias con npm
+RUN npm install --omit=dev
 
 # Copia el resto del código del proyecto
 COPY . .
 
 # Construye la aplicación
-RUN yarn build
+RUN npm run build
 
 # Expone el puerto en el que correrá la aplicación
 EXPOSE 8080
