@@ -6,12 +6,22 @@ import {
   Param,
   Put,
   Delete,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
 import { TeacherService } from './teacher.service';
 import { CreateTeacherDto, UpdateTeacherDto } from './dto';
 import { Authorization } from '@modules/auth/decorators/authorization.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Readable } from 'stream';
+import { ImportTeacherDto } from './dto/import-teacher.dto';
 //import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import csvParser from 'csv-parser';
+import { Unauthenticated } from '@modules/auth/decorators/unauthenticated.decorator';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Teachers')
 @Controller('teachers')
 export class TeacherController {
   constructor(private readonly teacherService: TeacherService) {}
@@ -59,6 +69,62 @@ export class TeacherController {
   })
   delete(@Param('id') id: string) {
     return this.teacherService.delete(id);
+  }
+
+  @Post('json')
+  @Unauthenticated()
+  @Authorization({
+    permission: 'teacher.importjson',
+    description: 'Eliminar un profesor por su id',
+  })
+  @ApiOperation({
+    summary: 'Crear profesores desde un archivo JSON',
+  })
+  async createTeachersFromJson(@Body() importTeacherDto: ImportTeacherDto[]) {
+    return this.teacherService.createTeachersFromJson(importTeacherDto);
+  }
+
+  // ✅ Cargar desde CSV
+  @Post('csv')
+  @Unauthenticated()
+  @Authorization({
+    permission: 'teacher.importcsv',
+    description: 'Eliminar un profesor por su id',
+  })
+  @UseInterceptors(FileInterceptor('file'))
+  async createTeachersFromCsv(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+
+    const records: ImportTeacherDto[] = [];
+
+    return new Promise((resolve, reject) => {
+      Readable.from(file.buffer)
+        .pipe(csvParser())
+        .on('data', row => {
+          records.push({
+            email: row.email,
+            dni: row.dni,
+            firstName: row.first_name,
+            lastName: row.last_name,
+            phone: row.phone || null,
+            phonesAdditional: row.phone_aditional ? row.phone_aditional.split(';') : [],
+            address: row.address || null,
+            personalEmail: row.personal_email || null,
+            isActive: true,
+          });
+        })
+        .on('end', async () => {
+          try {
+            const result = await this.teacherService.createTeachersFromJson(records);
+            resolve(result);
+          } catch (error) {
+            reject(error);
+          }
+        })
+        .on('error', reject);
+    });
   }
   /*
   @Get(':teacherId/schedules')

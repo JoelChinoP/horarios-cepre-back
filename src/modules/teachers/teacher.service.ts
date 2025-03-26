@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@database/prisma/prisma.service';
 import { CreateTeacherDto, UpdateTeacherDto, TeacherBaseDto, } from './dto';
 import { plainToInstance } from 'class-transformer';
+import { ImportTeacherDto } from './dto/import-teacher.dto';
 
 @Injectable()
 export class TeacherService {
@@ -64,6 +65,54 @@ export class TeacherService {
     return plainToInstance(TeacherBaseDto, obj);
   }
 
+  async createTeachersFromJson(data: ImportTeacherDto[]) {
+    if (data.length === 0) return { message: 'No hay datos para procesar' };
+  
+    return this.prisma.$transaction(async (tx) => {
+      await tx.user.createMany({
+        data: data.map(t => ({
+          email: t.email,
+          role: 'profesor',
+          isActive: true,
+        })),
+      });
+
+      const newUsers = await tx.user.findMany({
+        where: { 
+          email: { in: data.map(t => t.email) } 
+        },
+        select: { id: true, email: true }
+      });
+  
+      const userMap = new Map(newUsers.map(u => [u.email, u.id]));
+
+      await tx.userProfile.createMany({
+        data: data.map(t => ({
+          userId: userMap.get(t.email)!,
+          dni: t.dni,
+          firstName: t.firstName,
+          lastName: t.lastName,
+          phone: t.phone,
+          phonesAdditional: t.phonesAdditional || [],
+          address: t.address,
+          personalEmail: t.personalEmail,
+        })),
+      });
+  
+      await tx.teacher.createMany({
+        data: data.map(t => ({
+          userId: userMap.get(t.email)!,
+          courseId: 1,
+          jobShiftType: 'FullTime',
+        })),
+      });
+  
+      return { 
+        message: 'Profesores creados correctamente', 
+        inserted: data.length 
+      };
+    });
+  }
   //async getTeacherSchedules(teacherId: string) {
   //  return Promise.resolve(undefined);
   //}
