@@ -20,11 +20,17 @@ export class TeacherService {
 
   async findAll(): Promise<TeacherBaseDto[]> {
     const teachers = await this.prisma.teacher.findMany({
-      include: { user: true, courses: true }, // Incluye la relación con el usuario
+      where: { 
+        user: {
+          isActive: true
+        } 
+      },
+      include: { 
+        user: true, 
+        courses: true 
+      },
     });
-    return teachers.map((teacher) =>
-      this.mapToTeacherDto(teacher),
-    );
+    return teachers.map((teacher) => this.mapToTeacherDto(teacher));
   }
 
   async findOne(id: string): Promise<TeacherBaseDto> {
@@ -56,6 +62,29 @@ export class TeacherService {
       include: { user: true, courses: true }, // Incluye la relación con el usuario
     });
     return this.mapToTeacherDto(teacher);
+  }
+  
+  async deactivate(id: string) {
+    const teacher = await this.prisma.teacher.findUnique({ 
+      where: { id },
+      include: { user: true } // Incluir la relación con usuario
+    });
+    if (!teacher) {
+      throw new NotFoundException('Teacher not found');
+    }
+    if (!teacher.user) {
+      throw new NotFoundException('Associated user not found');
+    }
+    // Actualizar el estado isActive del usuario relacionado
+    await this.prisma.user.update({
+      where: { id: teacher.user.id },
+      data: { isActive: false }
+    });
+    // Opcional: Devolver el profesor actualizado con la información del usuario
+    return this.prisma.teacher.findUnique({
+      where: { id },
+      include: { user: true }
+    });
   }
 
   // ─────── Métodos auxiliares ───────

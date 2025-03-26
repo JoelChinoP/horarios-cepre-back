@@ -6,13 +6,17 @@ import {
   Param,
   Put,
   Delete,
+  Patch,
+  UseGuards,
 } from '@nestjs/common';
 import { TeacherService } from './teacher.service';
-import { CreateTeacherDto, UpdateTeacherDto } from './dto';
+import { CreateTeacherDto, UpdateTeacherDto, TeacherBaseDto } from './dto';
 import { Authorization } from '@modules/auth/decorators/authorization.decorator';
 //import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { JwtAuthGuard } from '@modules/auth/guards/jwt-auth.guard';
 
 @Controller('teachers')
+@UseGuards(JwtAuthGuard)
 export class TeacherController {
   constructor(private readonly teacherService: TeacherService) {}
 
@@ -28,9 +32,9 @@ export class TeacherController {
   @Get()
   @Authorization({
     permission: 'teacher.list',
-    description: 'Obtener todos los profesores',
+    description: 'Obtener todos los profesores activos',
   })
-  findAll() {
+  findAll(): Promise<TeacherBaseDto[]> {
     return this.teacherService.findAll();
   }
 
@@ -59,6 +63,15 @@ export class TeacherController {
   })
   delete(@Param('id') id: string) {
     return this.teacherService.delete(id);
+  }
+
+  @Patch(':id/deactivate')
+  @Authorization({
+    permission: 'teacher.deactivate',
+    description: 'Desactivar un teacher por su id',
+  })
+  async deactivateTeacher(@Param('id') id: string) {
+    return this.teacherService.deactivate(id);
   }
   /*
   @Get(':teacherId/schedules')
