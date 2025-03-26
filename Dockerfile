@@ -1,44 +1,48 @@
-# Usa Node.js como imagen base
-FROM node:22 AS build
+# Imagen base
+FROM node:22
 
-# Establece el directorio de trabajo
+# Directorio de trabajo en el contenedor
 WORKDIR /app
 
-# Copia package.json y package-lock.json antes de instalar dependencias
+# Copiar archivos al contenedor
 COPY package.json package-lock.json ./
+RUN npm install --only=production
 
-# Instala dependencias
-RUN npm install
-
-# Copia el código fuente
+# Copiar el resto del código
 COPY . .
 
-# **Genera los archivos de Prisma**
-RUN npx prisma generate
+# Variables de entorno
+ARG DATABASE_URL
+ARG DB_HOST
+ARG DB_PORT
+ARG DB_USER
+ARG DB_DATABASE
+ARG DB_PASSWORD
+ARG GOOGLE_CLIENT_ID
+ARG GOOGLE_CLIENT_SECRET
+ARG GOOGLE_REDIRECT_URI
+ARG JWT_SECRET
+ARG JWT_EXPIRES_IN
+ARG REDIRECT_FRONT
 
-# Si usas migraciones en producción, aplica los cambios
-RUN npx prisma migrate deploy
+ENV DATABASE_URL=$DATABASE_URL
+ENV DB_HOST=$DB_HOST
+ENV DB_PORT=$DB_PORT
+ENV DB_USER=$DB_USER
+ENV DB_DATABASE=$DB_DATABASE
+ENV DB_PASSWORD=$DB_PASSWORD
+ENV GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
+ENV GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
+ENV GOOGLE_REDIRECT_URI=$GOOGLE_REDIRECT_URI
+ENV JWT_SECRET=$JWT_SECRET
+ENV JWT_EXPIRES_IN=$JWT_EXPIRES_IN
+ENV REDIRECT_FRONT=$REDIRECT_FRONT
 
-# **Compila la aplicación**
+# Compilar el código
 RUN npm run build
 
-# Segunda etapa: imagen ligera para producción
-FROM node:18 AS runtime
-
-WORKDIR /app
-
-# Copia solo lo necesario para producción
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/package.json ./
-
-# Define variables de entorno
-ENV NODE_ENV=production
-ENV PORT=8080
-
-# Expone el puerto 8080 para Cloud Run
+# Exponer el puerto
 EXPOSE 8080
 
-# Ejecuta la aplicación
-CMD ["node", "./dist/main.js"]
-
+# Comando de inicio
+CMD ["node", "dist/main.js"]
