@@ -1,23 +1,26 @@
-# Usa Node.js 22 como imagen base
+# Usa la imagen oficial de Node.js 22
 FROM node:22
 
-# Define el directorio de trabajo dentro del contenedor
+# Establece el directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-# Copia los archivos necesarios antes de instalar dependencias
+# Copia package.json y package-lock.json antes de instalar dependencias
 COPY package.json package-lock.json ./
 
-# Instala dependencias con npm
+# Instala dependencias (incluyendo NestJS localmente)
 RUN npm install --omit=dev
 
-# Copia el resto del código del proyecto
+# Copia todo el código fuente
 COPY . .
 
-# Construye la aplicación
+# Asegura que Nest CLI esté disponible (si es necesario)
+RUN npm install -g @nestjs/cli
+
+# Construye el proyecto
 RUN npm run build
 
-# Expone el puerto en el que correrá la aplicación
+# Expone el puerto 8080
 EXPOSE 8080
 
-# Comando para correr la aplicación en Cloud Run
+# Comando para ejecutar la aplicación
 CMD ["node", "dist/main.js"]
