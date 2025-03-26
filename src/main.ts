@@ -39,9 +39,8 @@ async function bootstrap() {
     }),
   );
   const port = process.env.PORT || 8080;
-  await app.listen(port, '0.0.0.0', () => {
-    console.log(`Application running on port ${port}`);
-  });
+  await app.listen(port, '0.0.0.0'); // Asegura que escuche en todas las interfaces
+  console.log(`🚀 App running on port ${port}`);
 }
 
 bootstrap().catch((err) => {
