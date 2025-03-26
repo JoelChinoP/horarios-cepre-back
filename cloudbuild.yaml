@@ -1,66 +1,42 @@
 steps:
-  # Step 1: Obtener los secretos del Secret Manager y exportarlos como variables de entorno
-  - name: 'gcr.io/cloud-builders/gcloud'
-    id: 'Fetch Secrets'
+  # Autenticación con Secret Manager
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        echo "Fetching secrets..."
-        echo "DATABASE_URL=$(gcloud secrets versions access latest --secret=DATABASE_URL)" >> /workspace/.env
-        echo "DB_HOST=$(gcloud secrets versions access latest --secret=DB_HOST)" >> /workspace/.env
-        echo "DB_PORT=$(gcloud secrets versions access latest --secret=DB_PORT)" >> /workspace/.env
-        echo "DB_USER=$(gcloud secrets versions access latest --secret=DB_USER)" >> /workspace/.env
-        echo "DB_DATABASE=$(gcloud secrets versions access latest --secret=DB_DATABASE)" >> /workspace/.env
-        echo "DB_PASSWORD=$(gcloud secrets versions access latest --secret=DB_PASSWORD)" >> /workspace/.env
-        echo "GOOGLE_CLIENT_ID=$(gcloud secrets versions access latest --secret=GOOGLE_CLIENT_ID)" >> /workspace/.env
-        echo "GOOGLE_CLIENT_SECRET=$(gcloud secrets versions access latest --secret=GOOGLE_CLIENT_SECRET)" >> /workspace/.env
-        echo "GOOGLE_REDIRECT_URI=$(gcloud secrets versions access latest --secret=GOOGLE_REDIRECT_URI)" >> /workspace/.env
-        echo "JWT_SECRET=$(gcloud secrets versions access latest --secret=JWT_SECRET)" >> /workspace/.env
-        echo "JWT_EXPIRES_IN=$(gcloud secrets versions access latest --secret=JWT_EXPIRES_IN)" >> /workspace/.env
-        echo "REDIRECT_FRONT=$(gcloud secrets versions access latest --secret=REDIRECT_FRONT)" >> /workspace/.env
+        echo DATABASE_URL=$(gcloud secrets versions access latest --secret=DATABASE_URL) >> .env
+        echo DB_HOST=$(gcloud secrets versions access latest --secret=DB_HOST) >> .env
+        echo DB_PORT=$(gcloud secrets versions access latest --secret=DB_PORT) >> .env
+        echo DB_USER=$(gcloud secrets versions access latest --secret=DB_USER) >> .env
+        echo DB_DATABASE=$(gcloud secrets versions access latest --secret=DB_DATABASE) >> .env
+        echo DB_PASSWORD=$(gcloud secrets versions access latest --secret=DB_PASSWORD) >> .env
+        echo GOOGLE_CLIENT_ID=$(gcloud secrets versions access latest --secret=GOOGLE_CLIENT_ID) >> .env
+        echo GOOGLE_CLIENT_SECRET=$(gcloud secrets versions access latest --secret=GOOGLE_CLIENT_SECRET) >> .env
+        echo GOOGLE_REDIRECT_URI=$(gcloud secrets versions access latest --secret=GOOGLE_REDIRECT_URI) >> .env
+        echo JWT_SECRET=$(gcloud secrets versions access latest --secret=JWT_SECRET) >> .env
+        echo JWT_EXPIRES_IN=$(gcloud secrets versions access latest --secret=JWT_EXPIRES_IN) >> .env
+        echo REDIRECT_FRONT=$(gcloud secrets versions access latest --secret=REDIRECT_FRONT) >> .env
 
-  # Step 2: Construir la imagen Docker
+  # Construcción de la imagen con Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
-    id: 'Build Image'
-    args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/horarios-cepre-back/horarios-cepre-back', '.']
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/horarios-repo/horarios-cepre-back', '.']
 
-  # Step 3: Subir la imagen a Artifact Registry
+  # Push de la imagen a Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
-    id: 'Push Image'
-    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/horarios-cepre-back/horarios-cepre-back']
+    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/horarios-repo/horarios-cepre-back']
 
-  # Step 4: Migraciones de Prisma
-  - name: 'gcr.io/cloud-builders/docker'
-    id: 'Run Prisma Migrations'
-    args: ['run', '--rm', '--env-file', '.env', 'us-central1-docker.pkg.dev/$PROJECT_ID/horarios-cepre-back/horarios-cepre-back', 'npx', 'prisma', 'migrate', 'deploy']
-
-  # Step 5: Desplegar en Cloud Run
+  # Despliegue en Cloud Run
   - name: 'gcr.io/cloud-builders/gcloud'
-    id: 'Deploy Cloud Run'
     args:
       - 'run'
       - 'deploy'
       - 'horarios-cepre-back'
-      - '--image=us-central1-docker.pkg.dev/$PROJECT_ID/horarios-cepre-back/horarios-cepre-back'
+      - '--image=us-central1-docker.pkg.dev/$PROJECT_ID/horarios-repo/horarios-cepre-back'
       - '--region=us-central1'
       - '--platform=managed'
       - '--allow-unauthenticated'
-      - '--set-env-vars=DATABASE_URL=$(gcloud secrets versions access latest --secret=DATABASE_URL)'
-      - '--set-env-vars=DB_HOST=$(gcloud secrets versions access latest --secret=DB_HOST)'
-      - '--set-env-vars=DB_PORT=$(gcloud secrets versions access latest --secret=DB_PORT)'
-      - '--set-env-vars=DB_USER=$(gcloud secrets versions access latest --secret=DB_USER)'
-      - '--set-env-vars=DB_DATABASE=$(gcloud secrets versions access latest --secret=DB_DATABASE)'
-      - '--set-env-vars=DB_PASSWORD=$(gcloud secrets versions access latest --secret=DB_PASSWORD)'
-      - '--set-env-vars=GOOGLE_CLIENT_ID=$(gcloud secrets versions access latest --secret=GOOGLE_CLIENT_ID)'
-      - '--set-env-vars=GOOGLE_CLIENT_SECRET=$(gcloud secrets versions access latest --secret=GOOGLE_CLIENT_SECRET)'
-      - '--set-env-vars=GOOGLE_REDIRECT_URI=$(gcloud secrets versions access latest --secret=GOOGLE_REDIRECT_URI)'
-      - '--set-env-vars=JWT_SECRET=$(gcloud secrets versions access latest --secret=JWT_SECRET)'
-      - '--set-env-vars=JWT_EXPIRES_IN=$(gcloud secrets versions access latest --secret=JWT_EXPIRES_IN)'
-      - '--set-env-vars=REDIRECT_FRONT=$(gcloud secrets versions access latest --secret=REDIRECT_FRONT)'
-
-images:
-  - 'us-central1-docker.pkg.dev/$PROJECT_ID/horarios-cepre-back/horarios-cepre-back'
+      - '--set-env-vars=DATABASE_URL=$(cat .env | grep DATABASE_URL | cut -d "=" -f2)'
 
 options:
   logging: CLOUD_LOGGING_ONLY
