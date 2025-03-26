@@ -22,4 +22,6 @@ steps:
 images:
   - 'gcr.io/$PROJECT_ID/horarios-cepre-back'
 
+options:
+  logging: CLOUD_LOGGING_ONLY
 
