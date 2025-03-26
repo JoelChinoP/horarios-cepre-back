@@ -12,6 +12,7 @@ export { ScheduleDto, ScheduleWeekDto };
 // DTO base con propiedades comunes
 export class ScheduleBaseDto extends OmitType(ScheduleDto, [
   'classId',
+  'courseId',
   'hourSessionId',
   'teacherId',
 ]) {}
@@ -20,17 +21,26 @@ export class ScheduleBaseDto extends OmitType(ScheduleDto, [
 export class CreateScheduleDto extends OmitType(ScheduleDto, [
   'id',
   'clas',
+  'course',
   'hourSession',
   'teacher',
 ] as const) {}
 
 // DTO para actualizar un área
 export class UpdateScheduleDto extends PartialType(
-  OmitType(ScheduleDto, ['id', 'clas', 'hourSession', 'teacher'] as const),
+  OmitType(ScheduleDto, [
+    'id',
+    'clas',
+    'course',
+    'hourSession',
+    'teacher',
+  ] as const),
 ) {}
 
 export class ScheduleForClass extends OmitType(ScheduleDto, [
   'clas',
+  'courseId',
+  'course',
   'teacher',
 ] as const) {
   name: string;

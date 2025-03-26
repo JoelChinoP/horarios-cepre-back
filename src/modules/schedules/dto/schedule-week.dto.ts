@@ -2,14 +2,13 @@ import {
   IsNotEmpty,
   IsString,
   IsEmail,
-  IsObject,
-  IsArray,
   IsOptional,
+  ValidateNested,
+  IsArray,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Weekday } from '@prisma/client';
+import { Type } from 'class-transformer';
 
-// DTO para los bloques de clases dentro de cada día
 export class DayScheduleDto {
   @IsNotEmpty()
   @IsString()
@@ -23,20 +22,45 @@ export class DayScheduleDto {
 
   @IsOptional()
   @IsEmail()
-  @ApiProperty({ example: 'juan.perez@cepr.unsa.pe' })
+  @ApiProperty({ example: 'juan.perez@cepr.unsa.pe', required: false })
   docente?: string;
 }
 
-// DTO principal que representa el horario de toda la semana
+export class DayDto {
+  @IsNotEmpty()
+  @IsString()
+  @ApiProperty({ example: 'Lunes' })
+  dia!: string;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => DayScheduleDto)
+  @ApiProperty({
+    example: [
+      {
+        bloque: '1,2',
+        curso: 'Historia',
+        docente: 'juan.perez@cepr.unsa.pe',
+      },
+      {
+        bloque: '3',
+        curso: 'Filosofía',
+        docente: 'maria.lopez@cepr.unsa.pe',
+      },
+    ],
+  })
+  clases!: DayScheduleDto[];
+}
+
 export class ScheduleWeekDto {
   @IsNotEmpty()
   @IsString()
-  @ApiProperty({ example: '101' })
-  salon!: string;
+  @ApiProperty({ example: '101I-Ingenierías' })
+  name!: string;
 
   @IsNotEmpty()
   @IsString()
-  @ApiProperty({ example: 'Sociales' })
+  @ApiProperty({ example: 'sociales' })
   area!: string;
 
   @IsNotEmpty()
@@ -54,21 +78,42 @@ export class ScheduleWeekDto {
   @ApiProperty({ example: 'cede central' })
   sede!: string;
 
-  @IsObject()
   @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => DayDto)
   @ApiProperty({
-    example: {
-      lunes: [
-        {
-          bloque: '1,2',
-          curso: 'Historia',
-          docente: 'juan.perez@cepr.unsa.pe',
-        },
-      ],
-      martes: [
-        { bloque: '1', curso: 'Cívica', docente: 'carlos.ramos@cepr.unsa.pe' },
-      ],
-    },
+    example: [
+      {
+        dia: 'Lunes',
+        clases: [
+          {
+            bloque: '1,2',
+            curso: 'Historia',
+            docente: 'juan.perez@cepr.unsa.pe',
+          },
+          {
+            bloque: '3',
+            curso: 'Filosofía',
+            docente: 'maria.lopez@cepr.unsa.pe',
+          },
+        ],
+      },
+      {
+        dia: 'Martes',
+        clases: [
+          {
+            bloque: '1',
+            curso: 'Cívica',
+            docente: 'carlos.ramos@cepr.unsa.pe',
+          },
+          {
+            bloque: '2,3',
+            curso: 'Psicología',
+            docente: 'lucia.salas@cepr.unsa.pe',
+          },
+        ],
+      },
+    ],
   })
-  days!: Record<Weekday, DayScheduleDto[]>;
+  horarios!: DayDto[];
 }

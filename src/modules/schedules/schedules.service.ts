@@ -8,8 +8,17 @@ import { LoadScheduleDto } from './dto';
 export class ScheduleService {
   constructor(private prisma: PrismaService) {}
 
-  loadWithCourses(data: LoadScheduleDto) {
-    console.log(data);
+  async loadWithCourses(data: LoadScheduleDto) {
+    const courses = await this.prisma.course.findMany({ select: { id: true, name: true } });
+    const hourSessions = await this.prisma.hourSession.findMany({ select: { id: true, period: true } });
+
+    const result = {
+      courses,
+      hourSessions
+    };
+    console.log(result)
+    console.log("##################################################");
+    return data;
   }
 
   // ─────── CRUD ───────

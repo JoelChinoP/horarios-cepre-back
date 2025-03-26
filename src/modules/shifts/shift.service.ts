@@ -48,13 +48,13 @@ export class ShiftService {
     const endTime = new Date(`${today}T${data.endTime}Z`);
 
     if (endTime <= startTime) {
-      throw new BadRequestException('Shift: invalid time difference');
+      throw new BadRequestException('Shift: end time must be after start time');
     }
 
     const diffMinutes =
       (endTime.getTime() - startTime.getTime() + 300000) / (1000 * 60);
     if (diffMinutes % 45 !== 0) {
-      throw new BadRequestException('Invalid shift times');
+      throw new BadRequestException('Shift: invalid time difference');
     }
 
     return { startTime, endTime, name: data.name };
