@@ -1,48 +1,23 @@
-# Imagen base
+# Usa Node.js 18 como imagen base
 FROM node:22
 
-# Directorio de trabajo en el contenedor
+# Define el directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-# Copiar archivos al contenedor
-COPY package.json package-lock.json ./
-RUN npm install --only=production
+# Copia los archivos del proyecto
+COPY package.json yarn.lock ./
 
-# Copiar el resto del código
+# Instala dependencias sin guardar en cache
+RUN yarn install --frozen-lockfile
+
+# Copia el resto del código del proyecto
 COPY . .
 
-# Variables de entorno
-ARG DATABASE_URL
-ARG DB_HOST
-ARG DB_PORT
-ARG DB_USER
-ARG DB_DATABASE
-ARG DB_PASSWORD
-ARG GOOGLE_CLIENT_ID
-ARG GOOGLE_CLIENT_SECRET
-ARG GOOGLE_REDIRECT_URI
-ARG JWT_SECRET
-ARG JWT_EXPIRES_IN
-ARG REDIRECT_FRONT
+# Construye la aplicación
+RUN yarn build
 
-ENV DATABASE_URL=$DATABASE_URL
-ENV DB_HOST=$DB_HOST
-ENV DB_PORT=$DB_PORT
-ENV DB_USER=$DB_USER
-ENV DB_DATABASE=$DB_DATABASE
-ENV DB_PASSWORD=$DB_PASSWORD
-ENV GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
-ENV GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
-ENV GOOGLE_REDIRECT_URI=$GOOGLE_REDIRECT_URI
-ENV JWT_SECRET=$JWT_SECRET
-ENV JWT_EXPIRES_IN=$JWT_EXPIRES_IN
-ENV REDIRECT_FRONT=$REDIRECT_FRONT
-
-# Compilar el código
-RUN npm run build
-
-# Exponer el puerto
+# Expone el puerto en el que correrá la aplicación
 EXPOSE 8080
 
-# Comando de inicio
+# Comando para correr la aplicación en Cloud Run
 CMD ["node", "dist/main.js"]
