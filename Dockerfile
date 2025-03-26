@@ -1,18 +1,20 @@
-# Usa una imagen base de Node.js
-FROM node:18-alpine
+# Etapa 1: Construcción de la aplicación
+FROM node:20 AS builder
 
-# Configurar el directorio de trabajo
 WORKDIR /app
 
-# Copiar archivos y dependencias
-COPY package.json package-lock.json ./
-RUN npm install --production
+COPY package*.json ./
+RUN npm install --only=production
 
-# Copiar el resto del código
 COPY . .
 
-# Exponer el puerto (ajústalo según la app)
-EXPOSE 3000
+RUN npm run build
 
-# Comando de inicio
+# Etapa 2: Ejecución
+FROM node:20
+
+WORKDIR /app
+
+COPY --from=builder /app ./
+
 CMD ["node", "dist/main.js"]
