@@ -1,29 +1,20 @@
 # Usa Node.js 22 como base
 FROM node:22
 
-# Establece el directorio de trabajo
-WORKDIR /app
+# Establece el directorio de trabajo en la raíz (ya que dist está allí)
+WORKDIR /
 
 # Copia solo archivos de dependencias primero (para optimizar caché de Docker)
 COPY package.json package-lock.json ./
 
-# Instala todas las dependencias, incluyendo devDependencies (necesarios para Prisma y Drizzle)
-RUN npm install
+# Instala dependencias con npm ci (más rápido y fiable que npm install)
+RUN npm ci
 
-# Copia todo el código fuente
+# Copia todo el código fuente, incluyendo la carpeta dist
 COPY . .
 
-# Genera el cliente de Prisma
-RUN npx prisma generate
-
-# Si usas Drizzle, asegúrate de que esté instalado
-RUN npm install drizzle-kit
-
-# Compila el código de NestJS
-RUN npm run build
-
-# Expone el puerto 8080
+# Expone el puerto 8080 para Cloud Run
 EXPOSE 8080
 
-# Ejecuta la aplicación
+# Ejecuta la aplicación desde la raíz
 CMD ["node", "dist/main.js"]
