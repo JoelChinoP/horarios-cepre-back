@@ -19,17 +19,23 @@ steps:
         gcloud secrets versions access latest --secret=REDIRECT_FRONT >> .env
         cat .env
 
-  # Instalación de dependencias y compilación de NestJS en Cloud Build
+  # Instalación de dependencias con npm ci
   - name: 'gcr.io/cloud-builders/npm'
     args: ['ci']
 
+  # Asegura que Prisma CLI está instalado
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['install', '--save-dev', '@prisma/cli']
+
+  # Generación de cliente Prisma
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['exec', 'prisma', 'generate']
+
+  # Compilación del código NestJS
   - name: 'gcr.io/cloud-builders/npm'
     args: ['run', 'build']
 
-  - name: 'gcr.io/cloud-builders/npm'
-    args: ['prisma', 'generate']
-
-  # Construcción de la imagen con Artifact Registry
+  # Construcción de la imagen Docker
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/horarios-repo/horarios-cepre-back', '.']
 
