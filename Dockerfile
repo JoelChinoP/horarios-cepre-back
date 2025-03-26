@@ -1,26 +1,29 @@
-# Usa la imagen oficial de Node.js 22
+# Usa Node.js 22 como base
 FROM node:22
 
-# Establece el directorio de trabajo dentro del contenedor
+# Establece el directorio de trabajo
 WORKDIR /app
 
-# Copia package.json y package-lock.json antes de instalar dependencias
+# Copia solo archivos de dependencias primero (para optimizar caché de Docker)
 COPY package.json package-lock.json ./
 
-# Instala dependencias (incluyendo NestJS localmente)
-RUN npm install --omit=dev
+# Instala todas las dependencias, incluyendo devDependencies (necesarios para Prisma y Drizzle)
+RUN npm install
 
 # Copia todo el código fuente
 COPY . .
 
-# Asegura que Nest CLI esté disponible (si es necesario)
-RUN npm install -g @nestjs/cli
+# Genera el cliente de Prisma
+RUN npx prisma generate
 
-# Construye el proyecto
+# Si usas Drizzle, asegúrate de que esté instalado
+RUN npm install drizzle-kit
+
+# Compila el código de NestJS
 RUN npm run build
 
 # Expone el puerto 8080
 EXPOSE 8080
 
-# Comando para ejecutar la aplicación
+# Ejecuta la aplicación
 CMD ["node", "dist/main.js"]
