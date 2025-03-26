@@ -22,6 +22,11 @@ export class MonitorService {
 
   async findAll(): Promise<MonitorBaseDto[]> {
     const monitors = await this.prisma.monitor.findMany({
+      where: { 
+        user: {
+          isActive: true
+        } 
+      },
       include: { user: true , supervisors:true }, // Incluye la relación con el usuario
     });
     return monitors.map((monitor) =>
@@ -116,5 +121,26 @@ export class MonitorService {
 
   private mapToMonitorDto(obj: any): MonitorBaseDto {
     return plainToInstance(MonitorBaseDto, obj);
+  }
+
+  async deactivate(id: string) {
+    const monitor = await this.prisma.monitor.findUnique({ 
+      where: { id },
+      include: { user: true } // Incluir la relación con usuario
+    });
+    if (!monitor) {
+      throw new NotFoundException('Monitor not found');
+    }
+    if (!monitor.user) {
+      throw new NotFoundException('Associated user not found');
+    }
+    await this.prisma.user.update({
+      where: { id: monitor.user.id },
+      data: { isActive: false }
+    });
+    return this.prisma.monitor.findUnique({
+      where: { id },
+      include: { user: true }
+    });
   }
 }

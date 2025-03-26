@@ -9,6 +9,7 @@ import {
   UseGuards,
   Req,
   BadRequestException,
+  Patch,
 } from '@nestjs/common';
 import { SupervisorService } from './supervisor.service';
 import { CreateSupervisorDto, UpdateSupervisorDto } from './dto';
@@ -85,5 +86,14 @@ export class SupervisorController {
   })
   delete(@Param('id') id: string) {
     return this.supervisorService.delete(id);
+  }
+
+  @Patch(':id/deactivate')
+  @Authorization({
+    permission: 'supervisor.deactivate',
+    description: 'Desactivar un supervisor por su id',
+  })
+  async deactivateSupervisor(@Param('id') id: string) {
+    return this.supervisorService.deactivate(id);
   }
 }

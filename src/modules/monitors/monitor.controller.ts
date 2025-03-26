@@ -8,6 +8,7 @@ import {
   Delete,
   Req,
   UseInterceptors,
+  Patch,
 } from '@nestjs/common';
 import { MonitorService } from './monitor.service';
 import { CreateMonitorDto, UpdateMonitorDto } from './dto';
@@ -74,5 +75,13 @@ export class MonitorController {
     console.log('Usuario autenticado:', req.user);
     const userId = req.user?.userId; // Obtenemos el ID del usuario desde el token
     return this.monitorService.getSchedule(userId);
+  }
+  @Patch(':id/deactivate')
+  @Authorization({
+    permission: 'monitor.deactivate',
+    description: 'Desactivar un monitor por su id',
+  })
+  async deactivateMonitor(@Param('id') id: string) {
+    return this.monitorService.deactivate(id);
   }
 }

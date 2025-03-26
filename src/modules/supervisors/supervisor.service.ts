@@ -26,6 +26,11 @@ export class SupervisorService {
 
   async findAll(): Promise<SupervisorBaseDto[]> {
     const supervisors = await this.prisma.supervisor.findMany({
+      where: { 
+        users: {
+          isActive: true
+        } 
+      },
       include: { users: true }, // Incluye la relación con el usuario
     });
     return supervisors.map((supervisor) => this.mapToSupervisorDto(supervisor));
@@ -108,6 +113,27 @@ export class SupervisorService {
         { excludeExtraneousValues: true },
       ),
     );
+  }
+
+  async deactivate(id: string) {
+    const supervisor = await this.prisma.supervisor.findUnique({ 
+      where: { id },
+      include: { users: true } // Incluir la relación con usuario
+    });
+    if (!supervisor) {
+      throw new NotFoundException('Teacher not found');
+    }
+    if (!supervisor.users) {
+      throw new NotFoundException('Associated user not found');
+    }
+    await this.prisma.user.update({
+      where: { id: supervisor.users.id },
+      data: { isActive: false }
+    });
+    return this.prisma.supervisor.findUnique({
+      where: { id },
+      include: { users: true }
+    });
   }
 
   // ─────── Métodos auxiliares ───────
