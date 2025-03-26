@@ -1,20 +1,8 @@
-# Etapa 1: Construcción de la aplicación
-FROM node:20 AS builder
-
+FROM node:18
 WORKDIR /app
-
-COPY package*.json ./
-RUN npm install --only=production
-
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
 COPY . .
-
-RUN npm run build
-
-# Etapa 2: Ejecución
-FROM node:20
-
-WORKDIR /app
-
-COPY --from=builder /app ./
-
+RUN yarn build
 CMD ["node", "dist/main.js"]
+EXPOSE 3000
