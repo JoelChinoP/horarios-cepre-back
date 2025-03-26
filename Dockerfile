@@ -1,32 +1,38 @@
-# Usa una imagen de Node.js como base
-FROM node:18 AS build
+# Usa Node.js como imagen base
+FROM node:22 AS build
 
-# Define el directorio de trabajo
+# Establece el directorio de trabajo
 WORKDIR /app
 
-# Copia archivos necesarios antes de instalar dependencias
+# Copia package.json y package-lock.json antes de instalar dependencias
 COPY package.json package-lock.json ./
 
-# Instala dependencias sin incluir devDependencies para producción
+# Instala dependencias
 RUN npm install
 
-# Copia el resto del código fuente
+# Copia el código fuente
 COPY . .
 
-# Compila la aplicación (asegúrate de que `tsconfig.json` esté bien configurado)
+# **Genera los archivos de Prisma**
+RUN npx prisma generate
+
+# Si usas migraciones en producción, aplica los cambios
+RUN npx prisma migrate deploy
+
+# **Compila la aplicación**
 RUN npm run build
 
-# Usa una imagen más ligera para producción
-FROM node:22 AS runtime
+# Segunda etapa: imagen ligera para producción
+FROM node:18 AS runtime
 
 WORKDIR /app
 
-# Copia los archivos compilados desde la etapa "build"
+# Copia solo lo necesario para producción
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/package.json ./
 
-# Establece variables de entorno
+# Define variables de entorno
 ENV NODE_ENV=production
 ENV PORT=8080
 
@@ -34,4 +40,5 @@ ENV PORT=8080
 EXPOSE 8080
 
 # Ejecuta la aplicación
-CMD ["node", "dist/main.js"]
+CMD ["node", "./dist/main.js"]
+
