@@ -5,28 +5,59 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '@database/prisma/prisma.service';
 import { CreateShiftDto, UpdateShiftDto } from './dto/index';
+import { CreateHourSessionDto } from '@modules/hour-session/dto';
 
 @Injectable()
 export class ShiftService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: CreateShiftDto) {
-    try {
-      const today = new Date().toISOString().split('T')[0]; // Obtiene la fecha actual (YYYY-MM-DD)
+    // Validar que las horas sean válidas y cumplan con la condición de bloques de 45 minutos
+    const { startTime, endTime, name } = this.validateShiftTimes(data);
 
-      return await this.prisma.shift.create({
-        data: {
-          name: data.name,
-          startTime: new Date(`${today}T${data.startTime}Z`).toISOString(),
-          endTime: new Date(`${today}T${data.endTime}Z`).toISOString(),
-        },
+    return await this.prisma.$transaction(async (tx) => {
+      const shift = await tx.shift.create({
+        data: { name, startTime, endTime },
       });
-    } catch (error) {
-      throw new BadRequestException(
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        'Error al crear el turno: ' + error.message,
-      );
+
+      const hourSessionData: CreateHourSessionDto[] = [];
+      const sessionDuration = 40 * 60 * 1000; // 40 minutes in milliseconds
+      const breakDuration = 5 * 60 * 1000; // 5 minutes in milliseconds
+      let current = new Date(startTime);
+
+      for (let i = 1; current < endTime; i++) {
+        const sessionEnd = new Date(current.getTime() + sessionDuration);
+        hourSessionData.push({
+          shiftId: shift.id,
+          period: i,
+          startTime: current.toISOString(),
+          endTime: sessionEnd.toISOString(),
+        });
+        current = new Date(sessionEnd.getTime() + breakDuration);
+      }
+
+      await tx.hourSession.createMany({
+        data: hourSessionData,
+      });
+      return shift;
+    });
+  }
+  private validateShiftTimes(data: CreateShiftDto) {
+    const today = new Date().toISOString().split('T')[0];
+    const startTime = new Date(`${today}T${data.startTime}Z`);
+    const endTime = new Date(`${today}T${data.endTime}Z`);
+
+    if (endTime <= startTime) {
+      throw new BadRequestException('Shift: end time must be after start time');
     }
+
+    const diffMinutes =
+      (endTime.getTime() - startTime.getTime() + 300000) / (1000 * 60);
+    if (diffMinutes % 45 !== 0) {
+      throw new BadRequestException('Shift: invalid time difference');
+    }
+
+    return { startTime, endTime, name: data.name };
   }
 
   async findAll() {

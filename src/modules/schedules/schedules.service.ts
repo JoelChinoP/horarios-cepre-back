@@ -2,10 +2,24 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@database/prisma/prisma.service';
 import { ScheduleBaseDto, CreateScheduleDto, UpdateScheduleDto } from './dto';
 import { plainToInstance } from 'class-transformer';
+import { LoadScheduleDto } from './dto';
 
 @Injectable()
 export class ScheduleService {
   constructor(private prisma: PrismaService) {}
+
+  async loadWithCourses(data: LoadScheduleDto) {
+    const courses = await this.prisma.course.findMany({ select: { id: true, name: true } });
+    const hourSessions = await this.prisma.hourSession.findMany({ select: { id: true, period: true } });
+
+    const result = {
+      courses,
+      hourSessions
+    };
+    console.log(result)
+    console.log("##################################################");
+    return data;
+  }
 
   // ─────── CRUD ───────
   async create(createScheduleDto: CreateScheduleDto): Promise<ScheduleBaseDto> {
