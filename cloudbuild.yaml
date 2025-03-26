@@ -1,6 +1,6 @@
 steps:
   # Authenticate and retrieve secrets from Secret Manager
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  - name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
     args:
       - '-c'
@@ -25,27 +25,19 @@ steps:
         echo "Secrets retrieved successfully."
 
   # Install dependencies
-  - name: 'node:22'
-    entrypoint: 'npm'
+  - name: 'gcr.io/cloud-builders/npm'
     args: ['ci', '--prefer-offline', '--no-audit']
 
   # Generate Prisma client
-  - name: 'node:22'
-    entrypoint: 'npx'
-    args: ['prisma', 'generate']
-
-  # Run tests (optional, but recommended)
-  - name: 'node:22'
-    entrypoint: 'npm'
-    args: ['run', 'test']
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['exec', 'prisma', 'generate']
 
   # Build the application
-  - name: 'node:22'
-    entrypoint: 'npm'
+  - name: 'gcr.io/cloud-builders/npm'
     args: ['run', 'build']
 
   # Build Docker image
-  - name: 'docker'
+  - name: 'gcr.io/cloud-builders/docker'
     args: [
       'build', 
       '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/horarios-repo/horarios-cepre-back:$COMMIT_SHA', 
@@ -54,7 +46,7 @@ steps:
     ]
 
   # Push Docker image to Artifact Registry
-  - name: 'docker'
+  - name: 'gcr.io/cloud-builders/docker'
     args: [
       'push', 
       'us-central1-docker.pkg.dev/$PROJECT_ID/horarios-repo/horarios-cepre-back', 
@@ -62,7 +54,7 @@ steps:
     ]
 
   # Deploy to Cloud Run
-  - name: 'gcloud'
+  - name: 'gcr.io/cloud-builders/gcloud'
     args: [
       'run', 'deploy', 'horarios-cepre-back',
       '--image', 'us-central1-docker.pkg.dev/$PROJECT_ID/horarios-repo/horarios-cepre-back:$COMMIT_SHA',
