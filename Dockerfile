@@ -13,11 +13,14 @@ RUN npm install --only=production
 # Copia el resto del código de la aplicación
 COPY . .
 
-# Establece la variable de entorno de producción
+# Establece la variable de entorno para producción
 ENV NODE_ENV=production
 
-# Expone el puerto en el que corre la aplicación
-EXPOSE 3000
+# Cloud Run espera que la aplicación escuche en el puerto 8080
+ENV PORT=8080
 
-# Comando por defecto para iniciar la aplicación
+# Expone el puerto correcto
+EXPOSE 8080
+
+# Comando para iniciar la aplicación
 CMD ["node", "dist/main.js"]
