@@ -1,20 +1,20 @@
-# Usa Node.js 22 como base
-FROM node:22
+# Use Node.js 22 as base image
+FROM node:22-alpine
 
-# Establece el directorio de trabajo en la raíz (ya que dist está allí)
+# Set working directory to root
 WORKDIR /
 
-# Copia solo archivos de dependencias primero (para optimizar caché de Docker)
-COPY package.json package-lock.json ./
+# Copy dependency files first
+COPY package*.json ./
 
-# Instala dependencias con npm ci (más rápido y fiable que npm install)
-RUN npm ci
+# Install dependencies
+RUN npm ci --omit=dev
 
-# Copia todo el código fuente, incluyendo la carpeta dist
+# Copy the entire project, including dist folder
 COPY . .
 
-# Expone el puerto 8080 para Cloud Run
+# Expose port
 EXPOSE 8080
 
-# Ejecuta la aplicación desde la raíz
+# Run application from the root
 CMD ["node", "dist/main.js"]
