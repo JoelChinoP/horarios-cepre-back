@@ -1,26 +1,37 @@
-# Usa una imagen base de Node.js
-FROM node:22 AS build
+# Usa una imagen de Node.js como base
+FROM node:18 AS build
 
-# Establece el directorio de trabajo dentro del contenedor
+# Define el directorio de trabajo
 WORKDIR /app
 
-# Copia los archivos de dependencias
+# Copia archivos necesarios antes de instalar dependencias
 COPY package.json package-lock.json ./
 
-# Instala las dependencias en modo producción
-RUN npm install --only=production
+# Instala dependencias sin incluir devDependencies para producción
+RUN npm install
 
-# Copia el resto del código de la aplicación
+# Copia el resto del código fuente
 COPY . .
 
-# Establece la variable de entorno para producción
-ENV NODE_ENV=production
+# Compila la aplicación (asegúrate de que `tsconfig.json` esté bien configurado)
+RUN npm run build
 
-# Cloud Run espera que la aplicación escuche en el puerto 8080
+# Usa una imagen más ligera para producción
+FROM node:22 AS runtime
+
+WORKDIR /app
+
+# Copia los archivos compilados desde la etapa "build"
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/package.json ./
+
+# Establece variables de entorno
+ENV NODE_ENV=production
 ENV PORT=8080
 
-# Expone el puerto correcto
+# Expone el puerto 8080 para Cloud Run
 EXPOSE 8080
 
-# Comando para iniciar la aplicación
+# Ejecuta la aplicación
 CMD ["node", "dist/main.js"]
