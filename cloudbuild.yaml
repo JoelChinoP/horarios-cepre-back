@@ -53,7 +53,7 @@ steps:
       '--all-tags'
     ]
 
-  # Deploy to Cloud Run
+  # Deploy to Cloud Run with simplified environment variable handling
   - name: 'gcr.io/cloud-builders/gcloud'
     args: [
       'run', 'deploy', 'horarios-cepre-back',
@@ -61,7 +61,7 @@ steps:
       '--region', 'us-central1',
       '--platform', 'managed',
       '--allow-unauthenticated',
-      '--set-secrets', 
+      '--update-secrets', 
       'DATABASE_URL=DATABASE_URL:latest,DB_HOST=DB_HOST:latest,DB_PORT=DB_PORT:latest,DB_USER=DB_USER:latest,DB_DATABASE=DB_DATABASE:latest,DB_PASSWORD=DB_PASSWORD:latest,GOOGLE_CLIENT_ID=GOOGLE_CLIENT_ID:latest,GOOGLE_CLIENT_SECRET=GOOGLE_CLIENT_SECRET:latest,GOOGLE_REDIRECT_URI=GOOGLE_REDIRECT_URI:latest,JWT_SECRET=JWT_SECRET:latest,JWT_EXPIRES_IN=JWT_EXPIRES_IN:latest,REDIRECT_FRONT=REDIRECT_FRONT:latest'
     ]
 
