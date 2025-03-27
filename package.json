@@ -22,6 +22,9 @@
     "drizzle-migrate": "ts-node src/database/drizzle/migrate.ts",
     "prisma-generate": "ts-node src/database/prisma/scripts/generate.ts"
   },
+  "prisma": {
+    "schema": "src/database/prisma/schema.prisma"
+  },
   "dependencies": {
     "@nestjs/cache-manager": "^3.0.0",
     "@nestjs/common": "^11.0.1",
