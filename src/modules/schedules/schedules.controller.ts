@@ -27,6 +27,10 @@ export class ScheduleController {
     summary: 'Cargar horarios con cursos',
     description: 'Load schedules with courses',
   })
+  @Authorization({
+    permission: 'schedule.loadWithCourses',
+    description: 'Cargar horarios con cursos',
+  })
   loadWithCourses(data: LoadScheduleDto) {
     return this.scheduleService.loadWithCourses(data);
   }
