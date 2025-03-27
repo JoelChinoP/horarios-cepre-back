@@ -21,7 +21,7 @@ RUN npm ci --omit=dev
 COPY . .
 
 # Generate Prisma client if using Prisma
-RUN npx prisma generate --schema=./src/database/prisma/schema.prisma
+RUN npx prisma generate --schema
 
 # Build the project
 RUN npm run build
