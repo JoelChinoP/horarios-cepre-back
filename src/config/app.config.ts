@@ -6,4 +6,5 @@ export default () => ({
     ALL_ADMISSIONS: 'all_admissions',
     CURRENT_ADMISSION: 'current_admission',
   },
+  REDIRECT_FRONT: process.env.REDIRECT_FRONT || 'http://localhost:5173/',
 });

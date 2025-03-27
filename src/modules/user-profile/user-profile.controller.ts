@@ -25,7 +25,6 @@ export class UserProfileController {
   constructor(private readonly userProfileService: UserProfileService) {}
 
   @Authorization({
-    description: 'GAA',
     permission: 'userProfile.create',
     roles: [Role.ADMIN],
   })
@@ -43,7 +42,6 @@ export class UserProfileController {
 
   @Get()
   @Authorization({
-    description: 'GAA',
     permission: 'userProfile.list',
     roles: [Role.ADMIN],
   })
@@ -52,11 +50,19 @@ export class UserProfileController {
   }
 
   @Get(':id')
+  @Authorization({
+    permission: 'userProfile.getById',
+    description: 'Obtener un perfil de usuario por su id',
+  })
   findOne(@Param('id') id: string) {
     return this.userProfileService.findOne(id);
   }
 
   @Patch(':id')
+  @Authorization({
+    permission: 'userProfile.update',
+    description: 'Actualizar un perfil de usuario por su id',
+  })
   update(
     @Param('id') id: string,
     @Body() updateUserProfileDto: UpdateUserProfileDto,
@@ -65,11 +71,19 @@ export class UserProfileController {
   }
 
   @Delete(':id')
+  @Authorization({
+    permission: 'userProfile.delete',
+    description: 'Eliminar un perfil de usuario por su id',
+  })
   remove(@Param('id') id: string) {
     return this.userProfileService.remove(id);
   }
 
   @Patch(':id/deactivate')
+  @Authorization({
+    permission: 'userProfile.deactivate',
+    description: 'Desactivar un perfil de usuario por su id',
+  })
   async deactivateUserProfile(@Param('id') id: string) {
     return this.userProfileService.deactivate(id);
   }

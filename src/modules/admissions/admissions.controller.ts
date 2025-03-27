@@ -9,16 +9,19 @@ import {
 } from '@nestjs/common';
 import { AdmissionsService } from './admissions.service';
 import { ApiOperation } from '@nestjs/swagger';
-import { Unauthenticated } from '@modules/auth/decorators/unauthenticated.decorator';
 import { CreateAdmissionDto } from './dto';
+import { Authorization } from '@modules/auth/decorators/authorization.decorator';
 
 @Controller('admissions')
 export class AdmissionsController {
   constructor(private readonly service: AdmissionsService) {}
 
   @Post()
-  @Unauthenticated()
   @HttpCode(HttpStatus.CREATED)
+  @Authorization({
+    permission: 'admission.create',
+    description: 'Crear un nuevo proceso de admisión',
+  })
   @ApiOperation({
     summary: 'Crear un nuevo proceso de admisión',
     description: 'Create a new process admision',
@@ -28,8 +31,11 @@ export class AdmissionsController {
   }
 
   @Get()
-  @Unauthenticated()
   @HttpCode(HttpStatus.OK)
+  @Authorization({
+    permission: 'admission.getAll',
+    description: 'Obtener todos los procesos de admisión',
+  })
   @ApiOperation({
     summary: 'Obtener todos los procesos de admisión',
     description: 'Get all admission processes',
@@ -39,8 +45,11 @@ export class AdmissionsController {
   }
 
   @Get('all')
-  @Unauthenticated()
   @HttpCode(HttpStatus.OK)
+  @Authorization({
+    permission: 'admission.getAllWithCache',
+    description: 'Obtener todos los procesos de admisión',
+  })
   @ApiOperation({
     summary: 'Obtener todos los procesos de admisión',
     description: 'Get all admission processes',
@@ -50,8 +59,11 @@ export class AdmissionsController {
   }
 
   @Get('current')
-  @Unauthenticated()
   @HttpCode(HttpStatus.OK)
+  @Authorization({
+    permission: 'admission.getCurrent',
+    description: 'Obtener el proceso de admisión actual',
+  })
   @ApiOperation({
     summary: 'Obtener el proceso de admisión actual',
     description: 'Get the current admission process',
@@ -61,8 +73,11 @@ export class AdmissionsController {
   }
 
   @Get(':name')
-  @Unauthenticated()
   @HttpCode(HttpStatus.OK)
+  @Authorization({
+    permission: 'admission.getOneByName',
+    description: 'Obtener un proceso de admisión por nombre',
+  })
   @ApiOperation({
     summary: 'Obtener un proceso de admisión por nombre',
     description: 'Get an admission process by name',

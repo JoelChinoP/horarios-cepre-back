@@ -9,12 +9,10 @@ import {
   HttpCode,
   HttpStatus,
   ParseIntPipe,
-  UseInterceptors,
 } from '@nestjs/common';
 import { AreaService } from './area.service';
 import { CreateAreaDto, UpdateAreaDto, AreaBaseDto } from './dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { PrismaExceptionInterceptor } from '@database/prisma/prisma-exception.interceptor';
 import {
   Authorization,
   Role,
@@ -24,7 +22,6 @@ import {
 
 @Controller('areas')
 @ApiTags('Areas')
-@UseInterceptors(PrismaExceptionInterceptor)
 export class AreaController {
   constructor(private readonly areaService: AreaService) {}
 

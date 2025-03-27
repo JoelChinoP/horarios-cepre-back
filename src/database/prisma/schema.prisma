@@ -109,9 +109,10 @@ model AreaCourseHour {
 
 model Course {
   id              Int              @id @default(autoincrement()) @db.SmallInt
-  name            String           @db.VarChar(48)
+  name            String           @unique @db.VarChar(48)
   color           String?          @db.VarChar(7)
   description     String?          @db.VarChar(255)
+  schedules       Schedule[]
   areaCourseHours AreaCourseHour[]
   teachers        Teacher[]
 
@@ -174,14 +175,16 @@ model HourSession {
 model Schedule {
   id            Int         @id @default(autoincrement())
   classId       String      @map("class_id") @db.Uuid
+  courseId      Int         @map("course_id") @db.SmallInt
   hourSessionId Int         @map("hour_session_id") @db.SmallInt
   teacherId     String?     @map("teacher_id") @db.Uuid
   weekday       Weekday
   clas          Class       @relation(fields: [classId], references: [id])
+  course        Course      @relation(fields: [courseId], references: [id])
   hourSession   HourSession @relation(fields: [hourSessionId], references: [id])
   teacher       Teacher?    @relation(fields: [teacherId], references: [id])
 
-  @@unique([classId, hourSessionId, teacherId, weekday])
+  @@unique([courseId, hourSessionId, teacherId, weekday])
   @@map("schedules")
 }
 

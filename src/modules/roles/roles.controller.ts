@@ -13,7 +13,7 @@ import {
 import { RolesService } from './roles.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateRoleDto, RoleResponseDto, UpdateRoleDto } from './dto';
-import { Unauthenticated } from '@modules/auth/decorators/unauthenticated.decorator';
+import { Authorization } from '@modules/auth/decorators/authorization.decorator';
 
 @Controller('roles')
 @ApiTags('Roles')
@@ -23,6 +23,10 @@ export class RolesController {
   // ─────── CRUD ───────
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @Authorization({
+    permission: 'role.create',
+    description: 'Crear un nuevo rol',
+  })
   @ApiOperation({
     summary: 'Crear un nuevo rol',
     description: 'Create a new role',
@@ -32,8 +36,11 @@ export class RolesController {
   }
 
   @Get()
-  @Unauthenticated()
   @HttpCode(HttpStatus.OK)
+  @Authorization({
+    permission: 'role.list',
+    description: 'Listar todos los roles',
+  })
   @ApiOperation({
     summary: 'Obtener todos los roles',
     description: 'Get all roles',
@@ -44,6 +51,10 @@ export class RolesController {
 
   @Put(':id')
   @HttpCode(HttpStatus.OK)
+  @Authorization({
+    permission: 'role.update',
+    description: 'Actualizar un rol',
+  })
   @ApiOperation({
     summary: 'Actualizar un rol',
     description: 'Update a role',
@@ -57,6 +68,10 @@ export class RolesController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @Authorization({
+    permission: 'role.delete',
+    description: 'Eliminar un rol',
+  })
   @ApiOperation({
     summary: 'Eliminar un rol',
     description: 'Delete a role',
@@ -66,9 +81,12 @@ export class RolesController {
   }
 
   // ─────── Ot
-  @Unauthenticated()
   @Get(':name')
   @HttpCode(HttpStatus.OK)
+  @Authorization({
+    permission: 'role.getByName',
+    description: 'Obtener un rol por nombre',
+  })
   @ApiOperation({
     summary: 'Obtener un rol con sus permisos',
     description: 'Get a role with its permissions',
@@ -77,9 +95,12 @@ export class RolesController {
     return this.rolesService.getAllPermissionsByRolName(name);
   }
 
-  @Unauthenticated()
   @Get('permissions')
   @HttpCode(HttpStatus.OK)
+  @Authorization({
+    permission: 'role.listWithPermissions',
+    description: 'Obtener todos los roles con sus permisos',
+  })
   @ApiOperation({
     summary: 'Obtener todos los roles con sus permisos',
     description: 'Get all roles with their permissions',

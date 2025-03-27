@@ -8,8 +8,10 @@ import {
   Body,
   HttpStatus,
   HttpCode,
-  UseInterceptors,
   ParseUUIDPipe,
+  UseGuards,
+  Req,
+  BadRequestException,
 } from '@nestjs/common';
 import { ClassService } from './class.service';
 //import { Prisma } from '@prisma/client';
@@ -19,24 +21,23 @@ import {
   ClassBaseDto,
   ClassForTeacherDto,
 } from './dto';
-import { PrismaExceptionInterceptor } from '@database/prisma/prisma-exception.interceptor';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import {Authorization, Role} from "@modules/auth/decorators/authorization.decorator";
+import { Authorization } from '@modules/auth/decorators/authorization.decorator';
+import { JwtAuthGuard } from '@modules/auth/guards/jwt-auth.guard';
 
 @Controller('classes')
-@UseInterceptors(PrismaExceptionInterceptor)
 @ApiTags('Classes')
+@UseGuards(JwtAuthGuard)
 export class ClassController {
   constructor(private readonly classService: ClassService) {}
 
   // ─────── CRUD ───────
-  @Authorization({
-    description: 'GAA',
-    permission: 'userProfile.create',
-    roles: [Role.ADMIN],
-  })
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @Authorization({
+    permission: 'class.create',
+    description: 'Crear una nueva clase',
+  })
   @ApiOperation({
     summary: 'Crear una nueva clase',
     description: 'Create a new class',
@@ -45,13 +46,12 @@ export class ClassController {
     return this.classService.create(createClassDto);
   }
 
-  @Authorization({
-    description: 'GAA',
-    permission: 'userProfile.create',
-    roles: [Role.ADMIN],
-  })
   @Get()
   @HttpCode(HttpStatus.OK)
+  @Authorization({
+    permission: 'class.list',
+    description: 'Obtener todas las clases',
+  })
   @ApiOperation({
     summary: 'Obtener todas las clases',
     description: 'Get all classes',
@@ -59,23 +59,33 @@ export class ClassController {
   findAll(): Promise<ClassBaseDto[]> {
     return this.classService.findAll();
   }
-  @Authorization({
-    description: 'GAA',
-    permission: 'userProfile.create',
-    roles: [Role.ADMIN],
-  })
-  @Get('test')
+
+  @Get('getClassOfTeacher')
   @HttpCode(HttpStatus.OK)
+  @Authorization({
+    permission: 'class.listByTeacher',
+    description: 'Obtener todas las clases del docente',
+  })
   @ApiOperation({
     summary: 'Obtener la clase del profito',
     description: 'Get all classes',
   })
-  test(): Promise<ClassForTeacherDto[]> {
-    return this.classService.findAllTest();
+  getClassOfTeacher(@Req() req): Promise<ClassForTeacherDto[]> {
+    console.log('Usuario autenticado:', req.user); // Debugging
+    const userId = req.user?.userId; // Verifica que exista
+
+    if (!userId) {
+      throw new BadRequestException('No se encontró el userId en la solicitud');
+    }
+    return this.classService.findClassesOfTeacher(userId);
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
+  @Authorization({
+    permission: 'class.getById',
+    description: 'Obtener una clase por id',
+  })
   @ApiOperation({
     summary: 'Obtener una clase por id',
     description: 'Get a class by id',
@@ -86,6 +96,10 @@ export class ClassController {
 
   @Put(':id')
   @HttpCode(HttpStatus.OK)
+  @Authorization({
+    permission: 'class.updateById',
+    description: 'Actualizar una clase por id',
+  })
   @ApiOperation({
     summary: 'Actualizar una clase por id',
     description: 'Update a class by id',
@@ -99,6 +113,10 @@ export class ClassController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @Authorization({
+    permission: 'class.deleteById',
+    description: 'Eliminar una clase por id',
+  })
   @ApiOperation({
     summary: 'Eliminar una clase por id',
     description: 'Delete a class by id',

@@ -6,6 +6,11 @@ import { AdmissionDto } from './admission.dto';
 // DTO identido al modelo de datos
 export { ObservationDto, AdmissionDto };
 
+export class AdmissionCurrentDto {
+  name: string;
+  year: number;
+}
+
 export class AdmissionBaseDto extends OmitType(AdmissionDto, [
   'id',
   'description',

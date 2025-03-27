@@ -9,19 +9,21 @@ export class AreaService {
 
   // ─────── CRUD ───────
   async create(createAreaDto: CreateAreaDto): Promise<AreaBaseDto> {
-    const obj = await this.prisma.area.create({
+    const obj = await this.prisma.getClient().area.create({
       data: createAreaDto,
     });
     return this.mapToAreaDto(obj);
   }
 
   async findAll(): Promise<AreaBaseDto[]> {
-    const objs = await this.prisma.area.findMany();
+    const objs = await this.prisma.getClient().area.findMany();
     return objs.map((obj) => this.mapToAreaDto(obj));
   }
 
   async findOne(id: number): Promise<AreaBaseDto> {
-    const obj = await this.prisma.area.findUnique({ where: { id } });
+    const obj = await this.prisma
+      .getClient()
+      .area.findUnique({ where: { id } });
     if (!obj) {
       throw new NotFoundException(`Area with ID ${id} not found`);
     }
@@ -29,7 +31,7 @@ export class AreaService {
   }
 
   async update(id: number, updateAreaDto: UpdateAreaDto): Promise<AreaBaseDto> {
-    const obj = await this.prisma.area.update({
+    const obj = await this.prisma.getClient().area.update({
       where: { id },
       data: updateAreaDto,
     });
@@ -37,7 +39,7 @@ export class AreaService {
   }
 
   async delete(id: number): Promise<AreaBaseDto> {
-    const obj = await this.prisma.area.delete({
+    const obj = await this.prisma.getClient().area.delete({
       where: { id },
     });
     return this.mapToAreaDto(obj);

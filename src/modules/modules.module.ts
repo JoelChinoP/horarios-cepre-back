@@ -13,10 +13,10 @@ import { ShiftModule } from './shifts/shift.module';
 import { RolesModule } from './roles/roles.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { CourseModule } from '@modules/courses/course.module';
+
 // Guard de Autorización
 import { AuthorizationGuard } from './auth/guards/authorization.guard';
-import { APP_GUARD } from '@nestjs/core';
-import { JwtService } from '@nestjs/jwt';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 
 import { UserProfileModule } from './user-profile/user-profile.module';
 import { SupervisorModule } from '@modules/supervisors/supervisor.module';
@@ -24,12 +24,25 @@ import { MonitorModule } from '@modules/monitors/monitor.module';
 import { TeacherModule } from '@modules/teachers/teacher.module';
 
 import { AdmissionsModule } from './admissions/admissions.module';
+import { AuthGlobalGuard } from './auth/guards/auth-global.guard';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { SchemaManagerModule } from '@database/schema-manager/schema-manager.module';
+import { SchemaManagerInterceptor } from '@database/schema-manager/schema-manager.interceptor';
+import { PrismaExceptionInterceptor } from '@database/prisma/interceptors/exception.interceptor';
+import { AlsModule } from './shared/als.module';
 
 @Module({
   imports: [
-    UsersModule,
-    AuthModule,
+    SchemaManagerModule,
+    AlsModule,
+
     AdmissionsModule,
+    RolesModule,
+    PermissionsModule,
+
+    AuthModule,
+    UsersModule,
+    UserProfileModule,
 
     AreaModule,
     AreaCourseHourModule,
@@ -39,18 +52,23 @@ import { AdmissionsModule } from './admissions/admissions.module';
     ScheduleModule,
     SedeModule,
     ShiftModule,
-    RolesModule,
-    PermissionsModule,
-    UserProfileModule,
+
     SupervisorModule,
     MonitorModule,
     TeacherModule,
   ],
 
   exports: [
-    UsersModule,
-    AuthModule,
+    SchemaManagerModule,
+    AlsModule,
+
     AdmissionsModule,
+    RolesModule,
+    PermissionsModule,
+
+    AuthModule,
+    UsersModule,
+    UserProfileModule,
 
     AreaModule,
     AreaCourseHourModule,
@@ -61,19 +79,16 @@ import { AdmissionsModule } from './admissions/admissions.module';
     SedeModule,
     ShiftModule,
 
-    RolesModule,
-    PermissionsModule,
-
     SupervisorModule,
     MonitorModule,
     TeacherModule,
   ],
   providers: [
-    JwtService,
-    {
-      provide: APP_GUARD,
-      useClass: AuthorizationGuard,
-    },
+    JwtAuthGuard,
+    AuthorizationGuard,
+    { provide: APP_GUARD, useClass: AuthGlobalGuard },
+    { provide: APP_INTERCEPTOR, useClass: SchemaManagerInterceptor },
+    { provide: APP_INTERCEPTOR, useClass: PrismaExceptionInterceptor },
   ],
 })
 export class ModulesModule {}

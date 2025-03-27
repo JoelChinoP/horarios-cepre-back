@@ -10,9 +10,9 @@ import {
 import { plainToInstance } from 'class-transformer';
 import { ScheduleForTeacherDto } from '@modules/schedules/dto';
 import { HourSessionForTeacherDto } from '@modules/hour-session/dto';
-import {AreaDto} from "@modules/areas/dto";
-import {MonitorForTeacherDto} from "@modules/monitors/dto/monitorForTeacher.dto";
-import {UserProfileForTeacherDto} from "@modules/user-profile/dto/user-profile-for-teacher.dto";
+import { AreaDto } from '@modules/areas/dto';
+import { MonitorForTeacherDto } from '@modules/monitors/dto/monitorForTeacher.dto';
+import { UserProfileForTeacherDto } from '@modules/user-profile/dto/user-profile-for-teacher.dto';
 
 @Injectable()
 export class ClassService {
@@ -20,7 +20,7 @@ export class ClassService {
 
   // ─────── CRUD ───────
   async create(createClassDto: CreateClassDto): Promise<ClassBaseDto> {
-    const obj = await this.prisma.class.create({
+    const obj = await this.prisma.getClient().class.create({
       data: createClassDto,
       include: { sede: true, area: true, shift: true, monitor: true },
     });
@@ -28,14 +28,14 @@ export class ClassService {
   }
 
   async findAll(): Promise<ClassBaseDto[]> {
-    const classs = await this.prisma.class.findMany({
+    const classs = await this.prisma.getClient().class.findMany({
       include: { sede: true, area: true, shift: true, monitor: true },
     });
     return classs.map((clas) => this.mapToClassDto(clas));
   }
 
   async findOne(id: string): Promise<ClassBaseDto> {
-    const obj = await this.prisma.class.findUnique({
+    const obj = await this.prisma.getClient().class.findUnique({
       where: { id },
       include: { sede: true, area: true, shift: true, monitor: true },
     });
@@ -49,7 +49,7 @@ export class ClassService {
     id: string,
     updateClassDto: UpdateClassDto,
   ): Promise<ClassBaseDto> {
-    const obj = await this.prisma.class.update({
+    const obj = await this.prisma.getClient().class.update({
       where: { id },
       data: updateClassDto,
       include: { sede: true, area: true, shift: true, monitor: true },
@@ -58,7 +58,7 @@ export class ClassService {
   }
 
   async delete(id: string): Promise<ClassBaseDto> {
-    const obj = await this.prisma.class.delete({
+    const obj = await this.prisma.getClient().class.delete({
       where: { id },
       include: { sede: true, area: true, shift: true, monitor: true },
     });
@@ -70,8 +70,23 @@ export class ClassService {
     return plainToInstance(ClassBaseDto, obj);
   }
 
-  async findAllTest(): Promise<ClassForTeacherDto[]> {
-    const classs = await this.prisma.class.findMany({
+  async findClassesOfTeacher(userId: string): Promise<ClassForTeacherDto[]> {
+    const teacher = await this.prisma.getClient().teacher.findUnique({
+      where: { userId: userId },
+      select: { id: true },
+    });
+
+    if (!teacher) {
+      throw new NotFoundException('Profesor no encontrado');
+    }
+    const classs = await this.prisma.getClient().class.findMany({
+      where: {
+        schedules: {
+          some: {
+            teacherId: teacher.id,
+          },
+        },
+      },
       include: {
         area: true,
         shift: true,
