@@ -31,17 +31,19 @@ export class PrismaExceptionInterceptor implements NestInterceptor {
             case 'P2022': // Column not found
             case 'P2025': // Record not found
               return throwError(
-                () => new NotFoundException(`${modelName} not found`)
+                () => new NotFoundException(`${modelName} not found`),
               );
 
             // Unique constraint errors
-            case 'P2002': 
-              const target = Array.isArray(error.meta?.target) 
-                ? error.meta.target.join(', ') 
+            case 'P2002':
+              const target = Array.isArray(error.meta?.target)
+                ? error.meta.target.join(', ')
                 : error.meta?.target || 'field';
               return throwError(
                 () =>
-                  new ConflictException(`The value for '${target}' already exists.`),
+                  new ConflictException(
+                    `The value for '${target}' already exists.`,
+                  ),
               );
 
             // Foreign key constraint errors
@@ -49,7 +51,9 @@ export class PrismaExceptionInterceptor implements NestInterceptor {
               const field = error.meta?.field_name || 'field';
               return throwError(
                 () =>
-                  new BadRequestException(`Related ${field} not found or invalid`),
+                  new BadRequestException(
+                    `Related ${field} not found or invalid`,
+                  ),
               );
 
             default:

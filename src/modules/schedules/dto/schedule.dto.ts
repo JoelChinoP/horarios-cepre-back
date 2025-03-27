@@ -6,7 +6,7 @@ import {
   IsString,
   IsUUID,
 } from 'class-validator';
-import { Weekday } from '@prisma/client';
+import { Course, Weekday } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 import { ClassDto } from '@modules/classes/dto';
 import { HourSessionDto } from '@modules/hour-session/dto';
@@ -30,18 +30,26 @@ export class ScheduleDto {
   @IsNotEmpty()
   @IsNumber()
   @ApiProperty({ example: 456 })
+  courseId!: number;
+
+  @IsOptional()
+  course?: Course; //CAMBIAR POR DTO A FUTURO
+
+  @IsNotEmpty()
+  @IsNumber()
+  @ApiProperty({ example: 456 })
   hourSessionId!: number;
 
   @IsOptional()
-  hourSession: HourSessionDto; //CAMBIAR POR DTO A FUTURO
-
-  @IsNotEmpty()
-  @IsString()
-  @IsUUID()
-  teacherId!: string;
+  hourSession?: HourSessionDto; //CAMBIAR POR DTO A FUTURO
 
   @IsOptional()
-  teacher: TeacherDto; //CAMBIAR POR DTO A FUTURO
+  @IsString()
+  @IsUUID()
+  teacherId?: string;
+
+  @IsOptional()
+  teacher?: TeacherDto; //CAMBIAR POR DTO A FUTURO
 
   @IsOptional()
   @IsString()

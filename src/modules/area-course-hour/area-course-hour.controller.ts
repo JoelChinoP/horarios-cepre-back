@@ -8,7 +8,6 @@ import {
   Body,
   HttpCode,
   HttpStatus,
-  UseInterceptors,
   ParseIntPipe,
 } from '@nestjs/common';
 import { AreaCourseHourService } from './area-course-hour.service';
@@ -17,12 +16,10 @@ import {
   UpdateAreaCourseHourDto,
   AreaCourseHourBaseDto,
 } from './dto';
-import { PrismaExceptionInterceptor } from '@database/prisma/prisma-exception.interceptor';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Authorization } from '@modules/auth/decorators/authorization.decorator';
 
 @Controller('area-course-hours')
-@UseInterceptors(PrismaExceptionInterceptor)
 @ApiTags('AreaCourseHours')
 export class AreaCourseHourController {
   constructor(private readonly areaCourseHourService: AreaCourseHourService) {}

@@ -17,7 +17,7 @@ export class AreaCourseHourService {
   async create(
     createAreaCourseHourDto: CreateAreaCourseHourDto,
   ): Promise<AreaCourseHourBaseDto> {
-    const obj = await this.prisma.areaCourseHour.create({
+    const obj = await this.prisma.getClient().areaCourseHour.create({
       data: createAreaCourseHourDto,
       include: { area: true, course: true },
     });
@@ -25,14 +25,14 @@ export class AreaCourseHourService {
   }
 
   async findAll(): Promise<AreaCourseHourBaseDto[]> {
-    const objs = await this.prisma.areaCourseHour.findMany({
+    const objs = await this.prisma.getClient().areaCourseHour.findMany({
       include: { area: true, course: true },
     });
     return objs.map((data) => this.mapToAreaCourseHourDto(data));
   }
 
   async findOne(id: number): Promise<AreaCourseHourBaseDto> {
-    const obj = await this.prisma.areaCourseHour.findUnique({
+    const obj = await this.prisma.getClient().areaCourseHour.findUnique({
       where: { id },
       include: { area: true, course: true },
     });
@@ -46,7 +46,7 @@ export class AreaCourseHourService {
     id: number,
     updateAreaCourseHourDto: UpdateAreaCourseHourDto,
   ): Promise<AreaCourseHourBaseDto> {
-    const obj = await this.prisma.areaCourseHour.update({
+    const obj = await this.prisma.getClient().areaCourseHour.update({
       where: { id },
       include: { area: true, course: true },
       data: updateAreaCourseHourDto,
@@ -55,7 +55,7 @@ export class AreaCourseHourService {
   }
 
   async delete(id: number): Promise<AreaCourseHourBaseDto> {
-    const obj = await this.prisma.areaCourseHour.delete({
+    const obj = await this.prisma.getClient().areaCourseHour.delete({
       where: { id },
     });
     return this.mapToAreaCourseHourDto(obj);

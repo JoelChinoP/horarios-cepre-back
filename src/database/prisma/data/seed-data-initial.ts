@@ -1,12 +1,24 @@
 import { CreateCourseDto } from '@modules/courses/dto';
 import { GoogleAuthDto } from '@modules/auth/dto/auth-google.dto';
 import { Role } from '@modules/auth/decorators/authorization.decorator';
+import { CreateAreaDto } from '@modules/areas/dto';
+import { CreateSedeDto } from '@modules/sedes/dto';
 
 export const initialUsers: GoogleAuthDto[] = [
   {
     email: 'sistema.horarios@cepr.unsa.pe',
     role: Role.ADMIN,
   },
+];
+
+export const initalSedes: CreateSedeDto[] = [
+  { name: 'Sede Central', description: 'Sede Calle San Agustín' },
+];
+
+export const initialAreas: CreateAreaDto[] = [
+  { name: 'Ingenierías', description: 'Área de Ingenierías' },
+  { name: 'Biomédicas', description: 'Área de Biomédicas' },
+  { name: 'Sociales', description: 'Área de Sociales' },
 ];
 
 export const initialCourses: CreateCourseDto[] = [

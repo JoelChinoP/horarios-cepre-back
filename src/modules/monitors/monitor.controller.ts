@@ -7,16 +7,13 @@ import {
   Put,
   Delete,
   Req,
-  UseInterceptors,
 } from '@nestjs/common';
 import { MonitorService } from './monitor.service';
 import { CreateMonitorDto, UpdateMonitorDto } from './dto';
 import { ScheduleDto } from './dto/schedule.dto';
 import { Authorization } from '@modules/auth/decorators/authorization.decorator';
-import { PrismaExceptionInterceptor } from '@database/prisma/prisma-exception.interceptor';
 
 @Controller('monitors')
-@UseInterceptors(PrismaExceptionInterceptor)
 export class MonitorController {
   constructor(private readonly monitorService: MonitorService) {}
 
