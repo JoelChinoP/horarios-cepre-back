@@ -4,6 +4,8 @@ FROM node:22-alpine
 # Set working directory to root
 WORKDIR /
 
+ENV HOST 0.0.0.0
+
 # Copy dependency files first
 COPY package*.json ./
 
