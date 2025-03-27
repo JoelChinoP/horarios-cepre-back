@@ -7,7 +7,7 @@ export class SedeService {
 
   async create(data: CreateSedeDto) {
     try {
-      return await this.prisma.sede.create({ data });
+      return await this.prisma.getClient().sede.create({ data });
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       throw new Error('Error al crear la sede');
@@ -15,11 +15,13 @@ export class SedeService {
   }
 
   async findAll() {
-    return this.prisma.sede.findMany();
+    return this.prisma.getClient().sede.findMany();
   }
 
   async findOne(id: number) {
-    const sede = await this.prisma.sede.findUnique({ where: { id } });
+    const sede = await this.prisma
+      .getClient()
+      .sede.findUnique({ where: { id } });
     if (!sede) {
       throw new NotFoundException(`Sede con ID ${id} no encontrada`);
     }
@@ -28,7 +30,7 @@ export class SedeService {
 
   async update(id: number, data: UpdateSedeDto) {
     try {
-      return await this.prisma.sede.update({ where: { id }, data });
+      return await this.prisma.getClient().sede.update({ where: { id }, data });
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       throw new NotFoundException(
@@ -38,10 +40,12 @@ export class SedeService {
   }
 
   async remove(id: number) {
-    const sede = await this.prisma.sede.findUnique({ where: { id } });
+    const sede = await this.prisma
+      .getClient()
+      .sede.findUnique({ where: { id } });
     if (!sede) {
       throw new NotFoundException(`Sede con ID ${id} no encontrada`);
     }
-    return this.prisma.sede.delete({ where: { id } });
+    return this.prisma.getClient().sede.delete({ where: { id } });
   }
 }

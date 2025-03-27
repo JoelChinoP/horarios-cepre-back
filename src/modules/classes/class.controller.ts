@@ -8,7 +8,6 @@ import {
   Body,
   HttpStatus,
   HttpCode,
-  UseInterceptors,
   ParseUUIDPipe,
   UseGuards,
   Req,
@@ -22,13 +21,11 @@ import {
   ClassBaseDto,
   ClassForTeacherDto,
 } from './dto';
-import { PrismaExceptionInterceptor } from '@database/prisma/prisma-exception.interceptor';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Authorization } from '@modules/auth/decorators/authorization.decorator';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt-auth.guard';
 
 @Controller('classes')
-@UseInterceptors(PrismaExceptionInterceptor)
 @ApiTags('Classes')
 @UseGuards(JwtAuthGuard)
 export class ClassController {

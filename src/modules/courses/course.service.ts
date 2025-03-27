@@ -14,7 +14,7 @@ export class CourseService {
 
   async create(data: CreateCourseDto) {
     try {
-      return await this.prisma.course.create({ data });
+      return await this.prisma.getClient().course.create({ data });
     } catch (error) {
       this.handleDatabaseError(error);
     }
@@ -22,7 +22,7 @@ export class CourseService {
 
   async findAll() {
     try {
-      return await this.prisma.course.findMany();
+      return await this.prisma.getClient().course.findMany();
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       throw new InternalServerErrorException('Error al obtener los cursos.');
@@ -36,7 +36,9 @@ export class CourseService {
       );
     }
 
-    const course = await this.prisma.course.findUnique({ where: { id } });
+    const course = await this.prisma
+      .getClient()
+      .course.findUnique({ where: { id } });
     if (!course) {
       throw new NotFoundException(`El curso con ID ${id} no existe.`);
     }
@@ -47,7 +49,9 @@ export class CourseService {
     await this.findOne(id); // Verifica que el curso existe antes de actualizar
 
     try {
-      return await this.prisma.course.update({ where: { id }, data });
+      return await this.prisma
+        .getClient()
+        .course.update({ where: { id }, data });
     } catch (error) {
       this.handleDatabaseError(error);
     }
@@ -57,7 +61,7 @@ export class CourseService {
     await this.findOne(id); // Verifica que el curso existe antes de eliminar
 
     try {
-      return await this.prisma.course.delete({ where: { id } });
+      return await this.prisma.getClient().course.delete({ where: { id } });
     } catch (error) {
       this.handleDatabaseError(error);
     }

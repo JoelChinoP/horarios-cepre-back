@@ -20,7 +20,7 @@ export class ClassService {
 
   // ─────── CRUD ───────
   async create(createClassDto: CreateClassDto): Promise<ClassBaseDto> {
-    const obj = await this.prisma.class.create({
+    const obj = await this.prisma.getClient().class.create({
       data: createClassDto,
       include: { sede: true, area: true, shift: true, monitor: true },
     });
@@ -28,14 +28,14 @@ export class ClassService {
   }
 
   async findAll(): Promise<ClassBaseDto[]> {
-    const classs = await this.prisma.class.findMany({
+    const classs = await this.prisma.getClient().class.findMany({
       include: { sede: true, area: true, shift: true, monitor: true },
     });
     return classs.map((clas) => this.mapToClassDto(clas));
   }
 
   async findOne(id: string): Promise<ClassBaseDto> {
-    const obj = await this.prisma.class.findUnique({
+    const obj = await this.prisma.getClient().class.findUnique({
       where: { id },
       include: { sede: true, area: true, shift: true, monitor: true },
     });
@@ -49,7 +49,7 @@ export class ClassService {
     id: string,
     updateClassDto: UpdateClassDto,
   ): Promise<ClassBaseDto> {
-    const obj = await this.prisma.class.update({
+    const obj = await this.prisma.getClient().class.update({
       where: { id },
       data: updateClassDto,
       include: { sede: true, area: true, shift: true, monitor: true },
@@ -58,7 +58,7 @@ export class ClassService {
   }
 
   async delete(id: string): Promise<ClassBaseDto> {
-    const obj = await this.prisma.class.delete({
+    const obj = await this.prisma.getClient().class.delete({
       where: { id },
       include: { sede: true, area: true, shift: true, monitor: true },
     });
@@ -71,7 +71,7 @@ export class ClassService {
   }
 
   async findClassesOfTeacher(userId: string): Promise<ClassForTeacherDto[]> {
-    const teacher = await this.prisma.teacher.findUnique({
+    const teacher = await this.prisma.getClient().teacher.findUnique({
       where: { userId: userId },
       select: { id: true },
     });
@@ -79,7 +79,7 @@ export class ClassService {
     if (!teacher) {
       throw new NotFoundException('Profesor no encontrado');
     }
-    const classs = await this.prisma.class.findMany({
+    const classs = await this.prisma.getClient().class.findMany({
       where: {
         schedules: {
           some: {

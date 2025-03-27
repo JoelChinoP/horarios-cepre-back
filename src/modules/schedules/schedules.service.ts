@@ -9,21 +9,24 @@ export class ScheduleService {
   constructor(private prisma: PrismaService) {}
 
   async loadWithCourses(data: LoadScheduleDto) {
-    const courses = await this.prisma.course.findMany({ select: { id: true, name: true } });
-    const hourSessions = await this.prisma.hourSession.findMany({ select: { id: true, period: true } });
+    const courses = await this.prisma
+      .getClient()
+      .course.findMany({ select: { id: true, name: true } });
+    const hourSessions = await this.prisma
+      .getClient()
+      .hourSession.findMany({ select: { id: true, period: true } });
 
     const result = {
       courses,
-      hourSessions
+      hourSessions,
     };
-    console.log(result)
-    console.log("##################################################");
+    console.log(result);
     return data;
   }
 
   // ─────── CRUD ───────
   async create(createScheduleDto: CreateScheduleDto): Promise<ScheduleBaseDto> {
-    const schedule = await this.prisma.schedule.create({
+    const schedule = await this.prisma.getClient().schedule.create({
       data: createScheduleDto,
       include: { clas: true, hourSession: true, teacher: true },
     });
@@ -31,14 +34,14 @@ export class ScheduleService {
   }
 
   async findAll(): Promise<ScheduleBaseDto[]> {
-    const schedule = await this.prisma.schedule.findMany({
+    const schedule = await this.prisma.getClient().schedule.findMany({
       include: { clas: true, hourSession: true, teacher: true },
     });
     return schedule.map((data) => this.mapToScheduleDto(data));
   }
 
   async findOne(id: number): Promise<ScheduleBaseDto> {
-    const schedule = await this.prisma.schedule.findUnique({
+    const schedule = await this.prisma.getClient().schedule.findUnique({
       where: { id },
       include: { clas: true, hourSession: true, teacher: true },
     });
@@ -52,7 +55,7 @@ export class ScheduleService {
     id: number,
     updateScheduleDto: UpdateScheduleDto,
   ): Promise<ScheduleBaseDto> {
-    const schedule = await this.prisma.schedule.update({
+    const schedule = await this.prisma.getClient().schedule.update({
       where: { id },
       data: updateScheduleDto,
       include: { clas: true, hourSession: true, teacher: true },
@@ -61,7 +64,7 @@ export class ScheduleService {
   }
 
   async delete(id: number): Promise<ScheduleBaseDto> {
-    const schedule = await this.prisma.schedule.delete({
+    const schedule = await this.prisma.getClient().schedule.delete({
       where: { id },
       include: { clas: true, hourSession: true, teacher: true },
     });

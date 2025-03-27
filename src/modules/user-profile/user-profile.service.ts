@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '@database/prisma/prisma.service';
 import { CreateUserProfileDto } from './dto/create-user-profile.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 
@@ -9,7 +9,7 @@ export class UserProfileService {
 
   async create(userId: string, createUserProfileDto: CreateUserProfileDto) {
     // Verificar si el usuario existe antes de crear el perfil
-    const userExists = await this.prisma.user.findUnique({
+    const userExists = await this.prisma.getClient().user.findUnique({
       where: { id: userId },
     });
 
@@ -17,7 +17,7 @@ export class UserProfileService {
       throw new NotFoundException('Usuario no encontrado');
     }
 
-    return this.prisma.userProfile.create({
+    return this.prisma.getClient().userProfile.create({
       data: {
         userId,
         ...createUserProfileDto,
@@ -26,13 +26,13 @@ export class UserProfileService {
   }
 
   async findAll() {
-    return this.prisma.userProfile.findMany({
+    return this.prisma.getClient().userProfile.findMany({
       where: { isActive: true },
     });
   }
 
   async findOne(id: string) {
-    const userProfile = await this.prisma.userProfile.findUnique({
+    const userProfile = await this.prisma.getClient().userProfile.findUnique({
       where: { id },
     });
     if (!userProfile)
@@ -41,24 +41,26 @@ export class UserProfileService {
   }
 
   async update(id: string, data: UpdateUserProfileDto) {
-    return this.prisma.userProfile.update({
+    return this.prisma.getClient().userProfile.update({
       where: { id },
       data,
     });
   }
 
   async remove(id: string) {
-    return this.prisma.userProfile.delete({ where: { id } });
+    return this.prisma.getClient().userProfile.delete({ where: { id } });
   }
 
   async deactivate(id: string) {
-    const profile = await this.prisma.userProfile.findUnique({ where: { id } });
+    const profile = await this.prisma
+      .getClient()
+      .userProfile.findUnique({ where: { id } });
 
     if (!profile) {
       throw new NotFoundException('User profile not found');
     }
 
-    return this.prisma.userProfile.update({
+    return this.prisma.getClient().userProfile.update({
       where: { id },
       data: { isActive: false },
     });

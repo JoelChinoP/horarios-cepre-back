@@ -15,7 +15,7 @@ export class ShiftService {
     // Validar que las horas sean válidas y cumplan con la condición de bloques de 45 minutos
     const { startTime, endTime, name } = this.validateShiftTimes(data);
 
-    return await this.prisma.$transaction(async (tx) => {
+    return await this.prisma.getClient().$transaction(async (tx) => {
       const shift = await tx.shift.create({
         data: { name, startTime, endTime },
       });
@@ -61,11 +61,11 @@ export class ShiftService {
   }
 
   async findAll() {
-    return await this.prisma.shift.findMany();
+    return await this.prisma.getClient().shift.findMany();
   }
 
   async findOne(id: number) {
-    const shift = await this.prisma.shift.findUnique({
+    const shift = await this.prisma.getClient().shift.findUnique({
       where: { id },
     });
     if (!shift) {
@@ -76,7 +76,7 @@ export class ShiftService {
 
   async update(id: number, data: UpdateShiftDto) {
     try {
-      const existingShift = await this.prisma.shift.findUnique({
+      const existingShift = await this.prisma.getClient().shift.findUnique({
         where: { id },
       });
       if (!existingShift) {
@@ -85,7 +85,7 @@ export class ShiftService {
 
       const today = new Date().toISOString().split('T')[0];
 
-      return await this.prisma.shift.update({
+      return await this.prisma.getClient().shift.update({
         where: { id },
         data: {
           name: data.name ?? existingShift.name,
@@ -107,12 +107,14 @@ export class ShiftService {
 
   async remove(id: number) {
     try {
-      const shift = await this.prisma.shift.findUnique({ where: { id } });
+      const shift = await this.prisma
+        .getClient()
+        .shift.findUnique({ where: { id } });
       if (!shift) {
         throw new NotFoundException(`Turno con ID ${id} no encontrado.`);
       }
 
-      return await this.prisma.shift.delete({ where: { id } });
+      return await this.prisma.getClient().shift.delete({ where: { id } });
     } catch (error) {
       throw new BadRequestException(
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
