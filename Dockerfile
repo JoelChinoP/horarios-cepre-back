@@ -33,4 +33,4 @@ EXPOSE 8080
 RUN ls -la && env
 
 # Run application
-CMD ["sh", "-c", "node dist/src/main.js"]
+CMD ["sh", "-c", "node dist/main.js"]
