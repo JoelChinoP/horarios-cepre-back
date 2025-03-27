@@ -8,18 +8,15 @@ import {
   Body,
   HttpCode,
   HttpStatus,
-  UseInterceptors,
   ParseIntPipe,
 } from '@nestjs/common';
 import { ScheduleService } from './schedules.service';
 import { ScheduleBaseDto, CreateScheduleDto, UpdateScheduleDto } from './dto';
-import { PrismaExceptionInterceptor } from '@database/prisma/prisma-exception.interceptor';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Authorization } from '@modules/auth/decorators/authorization.decorator';
 import { LoadScheduleDto } from './dto';
 
 @Controller('schedules')
-@UseInterceptors(PrismaExceptionInterceptor)
 @ApiTags('Schedules')
 export class ScheduleController {
   constructor(private readonly scheduleService: ScheduleService) {}

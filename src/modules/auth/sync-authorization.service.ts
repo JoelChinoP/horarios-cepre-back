@@ -29,6 +29,8 @@ export class SyncAuthorizationService {
     1: 'POST',
     2: 'PUT',
     3: 'DELETE', //4: 'ALL', 5: 'PATCH', 6: 'OPTIONS', 7: 'HEAD',
+    4: 'ALL',
+    5: 'PATCH',
   };
 
   // async syncAuthorization() {

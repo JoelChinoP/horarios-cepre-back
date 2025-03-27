@@ -21,7 +21,7 @@ export class HourSessionService {
         data.startTime,
         data.endTime,
       );
-      return await this.prisma.hourSession.create({
+      return await this.prisma.getClient().hourSession.create({
         data: {
           shiftId: data.shiftId,
           period: data.period,
@@ -41,7 +41,7 @@ export class HourSessionService {
 
   async findAll() {
     try {
-      return await this.prisma.hourSession.findMany({
+      return await this.prisma.getClient().hourSession.findMany({
         include: { shift: true },
       });
     } catch (error) {
@@ -55,7 +55,7 @@ export class HourSessionService {
 
   async findOne(id: number) {
     try {
-      const session = await this.prisma.hourSession.findUnique({
+      const session = await this.prisma.getClient().hourSession.findUnique({
         where: { id },
         include: { shift: true },
       });
@@ -75,9 +75,11 @@ export class HourSessionService {
   async update(id: number, data: UpdateHourSessionDto) {
     try {
       // Verificar si la sesión existe
-      const existingSession = await this.prisma.hourSession.findUnique({
-        where: { id },
-      });
+      const existingSession = await this.prisma
+        .getClient()
+        .hourSession.findUnique({
+          where: { id },
+        });
 
       if (!existingSession) {
         throw new HttpException('Sesión no encontrada', HttpStatus.NOT_FOUND);
@@ -89,7 +91,7 @@ export class HourSessionService {
         data.endTime,
       );
 
-      return await this.prisma.hourSession.update({
+      return await this.prisma.getClient().hourSession.update({
         where: { id },
         data: {
           shiftId: data.shiftId,
@@ -110,7 +112,9 @@ export class HourSessionService {
 
   async remove(id: number) {
     try {
-      return await this.prisma.hourSession.delete({ where: { id } });
+      return await this.prisma
+        .getClient()
+        .hourSession.delete({ where: { id } });
     } catch (error) {
       throw new HttpException(
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
