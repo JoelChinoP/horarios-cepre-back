@@ -98,7 +98,7 @@ export class TeacherService {
         data: data.map((t) => ({
           userId: userMap.get(t.email)!,
           courseId: 1,
-          jobShiftType: 'FullTime',
+          jobStatus: 'FullTime',
         })),
       });
 
