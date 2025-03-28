@@ -110,9 +110,10 @@ export class TeacherController {
             lastName: row.last_name,
             phone: row.phone || null,
             phonesAdditional: row.phone_aditional ? row.phone_aditional.split(';') : [],
-            address: row.address || null,
             personalEmail: row.personal_email || null,
             isActive: true,
+            jobShiftType: row.job_shift_type || null,
+            courseName: row.course_name || null,
           });
         })
         .on('end', async () => {
