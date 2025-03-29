@@ -94,10 +94,10 @@ export class TeacherService {
         },
         select: { id: true, email: true },
       });
-  
+
       // Mapear emails a IDs de usuario
       const userMap = new Map(newUsers.map((u) => [u.email, u.id]));
-  
+
       // Crear los perfiles de usuario
       await tx.userProfile.createMany({
         data: data.map((t) => ({
@@ -110,16 +110,16 @@ export class TeacherService {
           personalEmail: t.personalEmail,
         })),
       });
-  
-      // Crear los profesores con el `jobShiftType` y `courseId`
+
+      // Crear los profesores con el `jobStatus` y `courseId`
       await tx.teacher.createMany({
         data: data.map((t) => ({
           userId: userMap.get(t.email)!,
           courseId: courseMap.get(t.courseName)!, // Obtener el ID del curso
-          jobShiftType: t.jobShiftType,
+          jobStatus: t.jobStatus,
         })),
       });
-  
+
       return {
         message: 'Profesores creados correctamente',
         inserted: data.length,

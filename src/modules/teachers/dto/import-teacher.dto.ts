@@ -1,7 +1,7 @@
 import { IsEmail, IsNotEmpty, IsOptional, IsString, IsBoolean, IsArray, IsEnum } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
-import { JobShiftType } from '@prisma/client';
+import { JobStatus } from '@prisma/client';
 
 @Expose()
 export class ImportTeacherDto {
@@ -71,8 +71,8 @@ export class ImportTeacherDto {
     description: 'Tipo de turno del profesor',
     example: 'FULL_TIME'
   })
-  @IsEnum(JobShiftType, { message: 'El tipo de turno debe ser FULL_TIME o PART_TIME' })
-  jobShiftType: JobShiftType; 
+  @IsEnum(JobStatus, { message: 'El tipo de turno debe ser FULL_TIME o PART_TIME' })
+  jobStatus: JobStatus; 
 
   @ApiProperty({
     description: 'Nombre del curso al que pertenece el profesor',

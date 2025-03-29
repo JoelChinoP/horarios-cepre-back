@@ -112,7 +112,7 @@ export class TeacherController {
             phonesAdditional: row.phone_aditional ? row.phone_aditional.split(';') : [],
             personalEmail: row.personal_email || null,
             isActive: true,
-            jobShiftType: row.job_shift_type || null,
+            jobStatus: row.job_status || null,
             courseName: row.course_name || null,
           });
         })
