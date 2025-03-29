@@ -32,6 +32,8 @@ export class UsersService {
   }
 
   async createUser(CreateUserDto: CreateUserDto): Promise<UserBaseDto> {
+    const data = 
+
     const user = await this.prisma.getClient().user.create({
       data: CreateUserDto,
     });
