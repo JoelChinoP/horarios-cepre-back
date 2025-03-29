@@ -31,11 +31,9 @@ export class UsersService {
     );
   }
 
-  async createUser(CreateUserDto: CreateUserDto): Promise<UserBaseDto> {
-    const data = 
-
+  async createUser(obj: CreateUserDto): Promise<UserBaseDto> {
     const user = await this.prisma.getClient().user.create({
-      data: CreateUserDto,
+      data: obj,
     });
     return plainToInstance(UserBaseDto, user, {
       excludePrefixes: ['password', 'googleId'],
